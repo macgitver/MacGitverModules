@@ -18,6 +18,7 @@
 #define MGV_DIFF_RAW_HIGHLIGHTER_H
 
 #include <QSyntaxHighlighter>
+#include <QTextEdit>
 
 class DiffRawHighlighter : public QSyntaxHighlighter
 {
