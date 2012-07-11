@@ -1,6 +1,4 @@
 
-SET( QT_DONT_USE_QTGUI 1 )
-INCLUDE( ${QT_USE_FILE} )
+PREPARE_USE_QT( Core )
 
-ADD_EXECUTABLE( hic hic.h hic.cpp )
-TARGET_LINK_LIBRARIES( hic ${QT_LIBRARIES} )
+ADD_QT_EXECUTABLE( hic hic.h hic.cpp )

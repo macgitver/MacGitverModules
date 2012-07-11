@@ -18,7 +18,7 @@
 
 
 DiffRawHighlighter::DiffRawHighlighter( QTextEdit* editor )
-	: QSyntaxHighlighter( editor )
+	: QSyntaxHighlighter( editor->document() )
 {
 }
 
