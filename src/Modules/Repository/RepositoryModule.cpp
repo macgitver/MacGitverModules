@@ -25,6 +25,7 @@
 #include "CreateRepositoryDlg.h"
 
 RepositoryModule::RepositoryModule()
+	: ConfigUser( "Repository" )
 {
 	mCore = new RepositoryCore;
 }
@@ -89,7 +90,15 @@ void RepositoryModule::onRepositoryOpen()
 #else
 	fd->setFileMode(QFileDialog::Directory);
 #endif
+
+	QString lastUsedDir = configGet( "lastUsedDir", "#" );
+	if( lastUsedDir != QLatin1String( "#" ) )
+	{
+		fd->setDirectory( lastUsedDir );
+	}
+
 	fd->setWindowTitle( trUtf8("Open a Git repository") );
+
 	fd->open(this, SLOT(onRepositoryOpenHelper()));
 }
 
@@ -101,10 +110,16 @@ void RepositoryModule::onRepositoryOpenHelper()
 	if ( fd->selectedFiles().isEmpty() )
 		return;
 
-	Git::Repository repo = Git::Repository::open( fd->selectedFiles().first() );
+	QString dirName = fd->selectedFiles().first();
+
+	Git::Repository repo = Git::Repository::open( dirName );
 	if( repo.isValid() )
 	{
 		MacGitver::self().setRepository( repo );
+
+		// If we successfully loaded the repository at that directory,
+		// we store it as "lastUsedDir"
+		configSet( "lastUsedDir", dirName );
 	}
 }
 
