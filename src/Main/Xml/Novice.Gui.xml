@@ -26,10 +26,18 @@
 		</Views>
 
 		<DefaultLayout>
-			<Tab Caption="Top">
-				<View Name="History"/>
-				<View Name="WorkTree"/>
-			</Tab>
+			<Split Orient="Horz">
+				<Tab Caption="Left">
+					<View Name="Refs"/>
+				</Tab>
+				<Tab Caption="Top" Stretch="3">
+					<View Name="History"/>
+					<View Name="WorkTree"/>
+				</Tab>
+                <Tab Caption="Right">
+					<View Name="Submodules"/>
+                </Tab>
+			</Split>
 		</DefaultLayout>
 
 	<!--
