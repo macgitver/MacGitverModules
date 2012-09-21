@@ -22,8 +22,10 @@
 #include <QStandardItemModel>
 #include <QToolBar>
 #include <QTreeView>
+#include <QFileInfo>
 
 #include "GitWrap/ObjectId.h"
+#include "GitWrap/MetaTypes.h"
 
 #include "MacGitver/MacGitver.h"
 #include "MacGitver/FSWatcher.h"
@@ -40,6 +42,7 @@ public:
 	void paint( QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index ) const;
 	QSize sizeHint( const QStyleOptionViewItem& option, const QModelIndex& index ) const;
 
+    inline void drawDisplay(QPainter *painter, const QStyleOptionViewItem &option, const QRect &rect, const QModelIndex &index) const;
 };
 
 
@@ -51,7 +54,6 @@ SubmodulesViewDelegate::SubmodulesViewDelegate( QObject* parent )
 void SubmodulesViewDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option,
 									const QModelIndex& index ) const
 {
-	const QFontMetrics& fm = option.fontMetrics;
 	if( index.column() != 0 )
 	{
 		QItemDelegate::paint( painter, option, index );
@@ -60,22 +62,50 @@ void SubmodulesViewDelegate::paint( QPainter* painter, const QStyleOptionViewIte
 
 	drawBackground( painter, option, index );
 
-	QRect textRect = option.rect.adjusted( 1, 1, -1, -1 );
+    drawDisplay( painter, option, option.rect.adjusted( 1, 1, -1, -1 ), index );
 
-	textRect.setBottom( textRect.top() + fm.lineSpacing() );
-	QFont f( option.font );
-	f.setBold( true );
-	painter->setFont( f );
-	painter->drawText( textRect, index.data().toString() );
+    QIcon theDecoration( index.data(Qt::DecorationRole).value<QIcon>() );
+    QRect decorationRect(QPoint(0, 0), option.decorationSize);
+    if ( option.decorationAlignment.testFlag(Qt::AlignVCenter) )
+    {
+         QPoint newCenter( decorationRect.center().x(), option.rect.center().y() );
+         decorationRect.moveCenter( newCenter );
+    }
+    QItemDelegate::drawDecoration( painter, option, decorationRect, theDecoration.pixmap(decorationRect.size()) );
 
-	textRect.moveTop( textRect.top() + fm.lineSpacing() );
-	painter->setFont( option.font );
-	painter->drawText( textRect,
-					   index.data( Qt::UserRole + 2 ).toString() %
-					   QLatin1String( " - " ) %
-					   index.data( Qt::UserRole + 1 ).toString() );
+    drawFocus( painter, option, option.rect );
+}
 
-	drawFocus( painter, option, option.rect );
+/**
+ * @brief Internal function to draw the item data requested on Qt::DisplayRole.
+ * @param painter
+ * @param option
+ * @param rect
+ * @param index
+ */
+void SubmodulesViewDelegate::drawDisplay(QPainter *painter, const QStyleOptionViewItem &option,
+                                         const QRect &rect, const QModelIndex &index) const
+{
+    const QFontMetrics& fm = option.fontMetrics;
+
+    QRect textRect = option.rect;
+    textRect.moveLeft( option.decorationSize.width() );
+    textRect.setBottom( textRect.top() + fm.lineSpacing() );
+
+    QFont f( option.font );
+    f.setBold( true );
+    painter->setFont( f );
+    painter->drawText( textRect, QLatin1String("Name: ") % index.data(Qt::DisplayRole).toString() );
+
+    textRect.moveTop( textRect.top() + fm.lineSpacing() );
+    painter->setFont( option.font );
+
+    const QVariant &submoduleData = index.data(Qt::UserRole + 1);
+    if ( submoduleData.canConvert<Git::Submodule>() )
+    {
+        const Git::Submodule &submodule = index.data(Qt::UserRole + 1).value<Git::Submodule>();
+        painter->drawText( textRect, QLatin1String("Version: ") % submodule.currentSHA1().toString() );
+    }
 }
 
 QSize SubmodulesViewDelegate::sizeHint( const QStyleOptionViewItem& option,
@@ -83,7 +113,7 @@ QSize SubmodulesViewDelegate::sizeHint( const QStyleOptionViewItem& option,
 {
 	const QFontMetrics& fm = option.fontMetrics;
 
-	return QSize( 200, 2 + 2 * fm.lineSpacing() );
+    return QSize( 50, 2 + 2 * fm.lineSpacing() );
 }
 
 SubmodulesView::SubmodulesView()
@@ -101,6 +131,11 @@ SubmodulesView::SubmodulesView()
 	mTree->setRootIsDecorated( false );
 	mTree->setHeaderHidden( true );
 	mTree->setFrameShape( QFrame::NoFrame );
+    mTree->setWordWrap( false );
+
+    //! @todo make this configurable in settings for tree views
+    mTree->setIconSize( QSize(24, 24) );
+
 	l->addWidget( mTree );
 
 	mModel = new QStandardItemModel( this );
@@ -110,13 +145,13 @@ SubmodulesView::SubmodulesView()
 
 	setLayout( l );
 
-	setViewName( trUtf8( "Submodules" ) );
+    setViewName( trUtf8( "Submodules") );
 
 	connect( &MacGitver::self(), SIGNAL(repositoryChanged(Git::Repository)),
 			 this, SLOT(repositoryChanged(Git::Repository)) );
 
 	Git::Repository repo = MacGitver::self().repository();
-	if( repo.isValid() )
+    if( repo.isValid() )
 	{
 		repositoryChanged( repo );
 	}
@@ -133,57 +168,27 @@ void SubmodulesView::repositoryChanged( Git::Repository repo )
 
 void SubmodulesView::readSubmodules()
 {
-	QList< Git::Submodule > submodules;
+    if ( !mRepo.isValid() )
+    {
+        //! @todo: add error handling
+        return;
+    }
 
-	if( mRepo.isValid() )
-	{
-		#ifdef LIBGIT_IMPROVED
-		submodules = mRepo.submodules();
-		#else
-		Git::Repository r = Git::Repository::open( mRepo.basePath() );
-		submodules = r.submodules();
-		#endif
-	}
-
-	QStringList toVisit = mNameToItem.keys();
-
-	foreach( Git::Submodule module, submodules )
+    QIcon decoration( QLatin1String(":/icons/subrepo.svg") );
+    foreach( Git::Submodule module, mRepo.submodules() )
 	{
 		if( !module.isValid() )
 			continue;
 
-		QString name = module.name();
-		QStandardItem* it = mNameToItem.value( name, NULL );
+        QStandardItem * it = new QStandardItem( decoration, QFileInfo(module.name()).baseName() );
+        it->setData( QVariant::fromValue(module), Qt::UserRole + 1 );
+        it->setToolTip( QLatin1String("URL: ") % module.url() %
+                        QLatin1String( "\n" ) %
+                        QLatin1String("Path: ") % module.path() );
 
-		if( it )
-		{
-			int i = toVisit.indexOf( name );
-			if( i != -1 )	// It should really be in, shouldn't it? :)
-			{
-				toVisit.removeAt( i );
-			}
-		}
-		else
-		{
-			it = new QStandardItem( name );
-			it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
-			mModel->appendRow( it );
-			mNameToItem.insert( name, it );
-		}
-
-		it->setData( module.path(), Qt::UserRole + 1 );
-		it->setData( module.url(), Qt::UserRole + 2 );
-		it->setData( module.fetchRecursive(), Qt::UserRole + 3 );
-		it->setData( module.updateStrategy(), Qt::UserRole + 4 );
-		it->setData( module.ignoreStrategy(), Qt::UserRole + 5 );
-		it->setData( module.currentSHA1().toString(), Qt::UserRole + 6 );
-	}
-
-	foreach( QString module, toVisit )
-	{
-		QStandardItem* it = mNameToItem.take( module );
-		delete it;
-	}
+        it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
+        mModel->appendRow( it );
+    }
 }
 
 void SubmodulesView::addSubmodule()

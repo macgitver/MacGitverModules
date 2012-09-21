@@ -45,7 +45,6 @@ private:
 	Git::Repository						mRepo;
 	QTreeView*							mTree;
 	QStandardItemModel*					mModel;
-	QHash< QString, QStandardItem* >	mNameToItem;
 };
 
 #endif

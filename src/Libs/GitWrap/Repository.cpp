@@ -918,24 +918,17 @@ namespace Git
 	{
 		QList< Submodule > list;
 
-		if( !result )
-		{
-			return list;
-		}
-
 		if( !d )
 		{
-			result.setInvalidObject();
-			return list;
+            if (result)
+                result.setInvalidObject();
+
+            return list;
 		}
 
 		Internal::cb_enum_submodules_t data = { &list, d };
 
 		result = git_submodule_foreach( d->mRepo, &Internal::cb_enum_submodules, &data );
-		if( !result )
-		{
-			return QList< Submodule >();
-		}
 
 		return list;
 	}
