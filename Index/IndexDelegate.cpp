@@ -1,3 +1,19 @@
+/*
+ * MacGitver: Index Module
+ * Copyright (C) 2013 Nils Fenner <nilsfenner@web.de>
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License (Version 2) as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #include "IndexDelegate.h"
 
 #include <QAbstractItemView>
@@ -6,15 +22,14 @@
 #include <QHelpEvent>
 
 #include "libGitWrap/ObjectId.hpp"
-#include "libGitWrap/Submodule.hpp"
 #include "libGitWrap/Result.hpp"
 
-SubmodulesViewDelegate::SubmodulesViewDelegate( QObject* parent )
+IndexViewDelegate::IndexViewDelegate( QObject* parent )
     : QItemDelegate( parent )
 {
 }
 
-void SubmodulesViewDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option,
+void IndexViewDelegate::paint( QPainter* painter, const QStyleOptionViewItem& option,
                                     const QModelIndex& index ) const
 {
     if( index.column() != 0 )
@@ -39,60 +54,60 @@ void SubmodulesViewDelegate::paint( QPainter* painter, const QStyleOptionViewIte
     drawFocus( painter, option, option.rect );
 }
 
-void SubmodulesViewDelegate::doDrawDisplay(QPainter *painter, const QStyleOptionViewItem &option,
+void IndexViewDelegate::doDrawDisplay(QPainter *painter, const QStyleOptionViewItem &option,
                                            const QRect &rect, const QModelIndex &index) const
 {
-    const QFontMetrics& fm = option.fontMetrics;
+//    const QFontMetrics& fm = option.fontMetrics;
 
-    QRect textRect = option.rect;
-    textRect.moveLeft( option.decorationSize.width() );
-    textRect.setBottom( textRect.top() + fm.lineSpacing() );
+//    QRect textRect = option.rect;
+//    textRect.moveLeft( option.decorationSize.width() );
+//    textRect.setBottom( textRect.top() + fm.lineSpacing() );
 
-    QVariant submoduleData = index.data(Qt::UserRole + 1);
-    if ( submoduleData.canConvert<Git::Submodule>() )
-    {
-        Git::Submodule submodule = index.data(Qt::UserRole + 1).value<Git::Submodule>();
+//    QVariant submoduleData = index.data(Qt::UserRole + 1);
+//    if ( submoduleData.canConvert<Git::Submodule>() )
+//    {
+//        Git::Submodule submodule = index.data(Qt::UserRole + 1).value<Git::Submodule>();
 
-        QFont f( option.font );
-        f.setBold( true );
-        painter->setFont( f );
-        painter->drawText( textRect, trUtf8("Name: %1").arg(submodule.name()) );
+//        QFont f( option.font );
+//        f.setBold( true );
+//        painter->setFont( f );
+//        painter->drawText( textRect, trUtf8("Name: %1").arg(submodule.name()) );
 
-        textRect.moveTop( textRect.top() + fm.lineSpacing() );
-        painter->setFont( option.font );
-        painter->drawText( textRect, trUtf8("Revision: %1").arg(submodule.wdOid().toString()) );
-    }
+//        textRect.moveTop( textRect.top() + fm.lineSpacing() );
+//        painter->setFont( option.font );
+//        painter->drawText( textRect, trUtf8("Revision: %1").arg(submodule.wdOid().toString()) );
+//    }
 }
 
-bool SubmodulesViewDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view,
+bool IndexViewDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view,
                                        const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     if ( !event || !view )
         return false;
 
-    QVariant submoduleData = index.data(Qt::UserRole + 1);
-    if ( !submoduleData.canConvert<Git::Submodule>() )
-        return false;
+//    QVariant submoduleData = index.data(Qt::UserRole + 1);
+//    if ( !submoduleData.canConvert<Git::Submodule>() )
+//        return false;
 
-    Git::Submodule submodule = index.data(Qt::UserRole + 1).value<Git::Submodule>();
+//    Git::Submodule submodule = index.data(Qt::UserRole + 1).value<Git::Submodule>();
 
-    if ( event->type() == QEvent::ToolTip )
-    {
-        Git::Result r;
-        QString tooltip =
-                trUtf8("URL: %1\nPath: %2")
-                .arg(submodule.url(r))
-                .arg(submodule.path(r));
+//    if ( event->type() == QEvent::ToolTip )
+//    {
+//        Git::Result r;
+//        QString tooltip =
+//                trUtf8("URL: %1\nPath: %2")
+//                .arg(submodule.url(r))
+//                .arg(submodule.path(r));
 
-        QToolTip::showText( event->globalPos(), tooltip, view );
+//        QToolTip::showText( event->globalPos(), tooltip, view );
 
-        return true;
-    }
+//        return true;
+//    }
 
-    return QItemDelegate::helpEvent( event, view, option, index );
+//    return QItemDelegate::helpEvent( event, view, option, index );
 }
 
-QSize SubmodulesViewDelegate::sizeHint( const QStyleOptionViewItem& option,
+QSize IndexViewDelegate::sizeHint( const QStyleOptionViewItem& option,
                                         const QModelIndex& index ) const
 {
     const QFontMetrics& fm = option.fontMetrics;

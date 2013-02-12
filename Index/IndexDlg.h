@@ -1,6 +1,6 @@
 /*
- * MacGitver
- * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
+ * MacGitver: Index Module
+ * Copyright (C) 2013 Nils Fenner <nilsfenner@web.de>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -14,10 +14,8 @@
  *
  */
 
-#ifndef MGV_SUBMODULES_CREATE_EDIT_DLG_H
-#define MGV_SUBMODULES_CREATE_EDIT_DLG_H
-
-#include "libGitWrap/Submodule.hpp"
+#ifndef MGV_INDEXDLG_H
+#define MGV_INDEXDLG_H
 
 #include "ui_IndexDlg.h"
 
