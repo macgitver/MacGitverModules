@@ -48,8 +48,8 @@ IndexView::IndexView()
 
 void IndexView::repositoryChanged( Git::Repository repo )
 {
-//    if( repo.isValid() )
-//    {
-//        mIndexView->updateIndex( repo );
-//    }
+    if( repo.isValid() )
+    {
+        mIndexView->updateIndex( repo );
+    }
 }

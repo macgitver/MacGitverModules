@@ -19,17 +19,58 @@
 
 #include "ui_IndexDlg.h"
 
+#include <QStandardItemModel>
+
+#include "libGitWrap/ChangeListConsumer.hpp"
+
+namespace Git
+{
+    class Repository;
+}
+
+struct Change
+{
+    QString oldPath;
+    QString newPath;
+    Git::ChangeListConsumer::Type type;
+    unsigned int similarity;
+    bool isBinary;
+
+    Change(const QString &theOldPath, const QString &theNewPath, Git::ChangeListConsumer::Type theType
+           , unsigned int theSimilarity, bool theIsBinary)
+        : oldPath(theOldPath), newPath(theNewPath), type(theType)
+        , similarity(theSimilarity), isBinary(theIsBinary)
+    {}
+};
+
+class UnstagedConsumer : public Git::ChangeListConsumer
+{
+public:
+    ~UnstagedConsumer()
+    {
+        qDeleteAll( mChanges );
+    }
+
+    bool raw(const QString &oldPath, const QString &newPath, Type type, unsigned int similarity, bool isBinary);
+
+//private:
+    QList<Change *>     mChanges;
+};
+
 class IndexDlg : public QDialog, private Ui::IndexDlg
 {
     Q_OBJECT
 public:
     IndexDlg(QWidget *parent = 0);
 
+    void updateIndex( Git::Repository repo );
+
 private slots:
 
 private:
 
 private:
+    QStandardItemModel mTestModel;
 
 };
 

@@ -20,6 +20,10 @@
 
 #include "libGitWrap/ObjectId.hpp"
 #include "libGitWrap/Result.hpp"
+#include "libGitWrap/Repository.hpp"
+#include "libGitWrap/DiffList.hpp"
+#include "libGitWrap/Reference.hpp"
+#include "libGitWrap/ObjectTree.hpp"
 
 
 IndexDlg::IndexDlg(QWidget *parent)
@@ -27,4 +31,33 @@ IndexDlg::IndexDlg(QWidget *parent)
     setupUi( this );
 
     setWindowTitle( trUtf8( "Stage" ) );
+
+    listUnstaged->setModel( &mTestModel );
+}
+
+void IndexDlg::updateIndex( Git::Repository repo)
+{
+    Git::Result r;
+    Git::DiffList diffIndex = repo.diffIndexToWorkingDir(r);
+    //Git::DiffList diffHead = repo.diffTreeToWorkingDir( repo.lookupTree(repo.HEAD(r).name(), r), r );
+
+    UnstagedConsumer consumer;
+    diffIndex.consumeChangeList(&consumer, r);
+    //diffHead.consumeChangeList(&consumer, r);
+
+    foreach( Change *c, consumer.mChanges)
+    {
+        QStandardItem * it = new QStandardItem( c->newPath );
+        it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
+
+        mTestModel.appendRow( it );
+    }
+}
+
+
+bool UnstagedConsumer::raw(const QString &oldPath, const QString &newPath, Git::ChangeListConsumer::Type type, unsigned int similarity, bool isBinary)
+{
+    mChanges.append( new Change(oldPath, newPath, type, similarity, isBinary) );
+
+    return true;
 }
