@@ -39,25 +39,12 @@ void IndexDlg::updateIndex( Git::Repository repo)
 {
     Git::Result r;
     Git::DiffList diffIndex = repo.diffIndexToWorkingDir(r);
-    //Git::DiffList diffHead = repo.diffTreeToWorkingDir( repo.lookupTree(repo.HEAD(r).name(), r), r );
 
-    UnstagedConsumer consumer;
-    diffIndex.consumeChangeList(&consumer, r);
-    //diffHead.consumeChangeList(&consumer, r);
-
-    foreach( Change *c, consumer.mChanges)
+    foreach( const Git::ChangeListEntry &c, diffIndex.changes(r))
     {
-        QStandardItem * it = new QStandardItem( c->newPath );
+        QStandardItem * it = new QStandardItem( c.newPath );
         it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
 
         mTestModel.appendRow( it );
     }
-}
-
-
-bool UnstagedConsumer::raw(const QString &oldPath, const QString &newPath, Git::ChangeListConsumer::Type type, unsigned int similarity, bool isBinary)
-{
-    mChanges.append( new Change(oldPath, newPath, type, similarity, isBinary) );
-
-    return true;
 }
