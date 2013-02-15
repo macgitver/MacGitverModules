@@ -40,7 +40,7 @@ void IndexDlg::updateIndex( Git::Repository repo)
     Git::Result r;
     Git::DiffList diffIndex = repo.diffIndexToWorkingDir(r);
 
-    foreach( const Git::ChangeListEntry &c, diffIndex.changes(r))
+    foreach( const Git::ChangeListEntry &c, diffIndex.changeList(r))
     {
         QStandardItem * it = new QStandardItem( c.newPath );
         it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
