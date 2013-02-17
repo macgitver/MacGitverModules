@@ -14,6 +14,7 @@ SET( SRC_FILES
     IndexModule.cpp
     IndexView.cpp
     IndexDelegate.cpp
+    IndexConfigPage.cpp
 )
 
 SET( HDR_FILES
@@ -22,11 +23,13 @@ SET( HDR_FILES
     IndexModule.h
     IndexView.h
     IndexDelegate.h
+    IndexConfigPage.h
 )
 
 SET( UI_FILES
 
     IndexDlg.ui
+    IndexConfigPage.ui
 )
 
 SET( HID_FILES
@@ -34,6 +37,7 @@ SET( HID_FILES
     IndexViewActions.hid
 )
 
+CFGCOMP( CFG_FILES IndexConfig.ccfg )
 QT_MOC( MOC_FILES ${HDR_FILES} )
 QT_UIC( UIC_FILES ${UI_FILES} )
 HIC( HIC_FILES ${HID_FILES} )
@@ -46,4 +50,5 @@ ADD_MGV_MODULE(
     ${MOC_FILES}
     ${UIC_FILES}
     ${HIC_FILES}
+    ${CFG_FILES}
 )

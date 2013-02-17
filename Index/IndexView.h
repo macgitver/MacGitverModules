@@ -17,6 +17,8 @@
 #ifndef MGV_INDEX_VIEW_H
 #define MGV_INDEX_VIEW_H
 
+#include "libMacGitverCore/Config/ConfigUser.h"
+
 #include "libHeaven/Views/GlobalView.hpp"
 
 #include "libGitWrap/Repository.hpp"
@@ -34,7 +36,7 @@ namespace Heaven
     class MiniSplitter;
 }
 
-class IndexView : public Heaven::GlobalView, private IndexViewActions
+class IndexView : public Heaven::GlobalView, private IndexViewActions, private ConfigUser
 {
     Q_OBJECT
 public:

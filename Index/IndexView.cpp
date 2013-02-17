@@ -76,6 +76,14 @@ void IndexView::repositoryChanged( Git::Repository repo )
     }
 }
 
+void IndexView::configChanged(const QString &subPath, const QVariant &value)
+{
+    if( subPath == QLatin1String( "SplitLayout" ) )
+    {
+        initSplitters();
+    }
+}
+
 void IndexView::initSplitters()
 {
     quint32 i = configGet( "SplitLayout", 0 );

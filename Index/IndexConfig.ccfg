@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CCfg ConfigPath="Index" Class="IndexConfig">
+
+    <Setting    Name="SplitLayout"
+                Type="UInt"
+                Validate="% &lt; 3"
+                Default="0"
+    />
+
+</CCfg>

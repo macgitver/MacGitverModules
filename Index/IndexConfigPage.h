@@ -1,6 +1,6 @@
 /*
- * MacGitver: Index Module
- * Copyright (C) 2013 Nils Fenner <nilsfenner@web.de>
+ * MacGitver
+ * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -14,28 +14,35 @@
  *
  */
 
-#ifndef MGV_MODULE_INDEX_H
-#define MGV_MODULE_INDEX_H
+#ifndef MGV_HISTORY_CONFIG_PAGE_H
+#define MGV_HISTORY_CONFIG_PAGE_H
 
-#include "libMacGitverCore/MacGitver/Module.h"
+#include <QWidget>
 
-class IndexModule : public Module
+#include "libMacGitverCore/Config/Ui/ConfigDialog.hpp"
+
+#include "ui_IndexConfigPage.h"
+
+class IndexConfigPage : public ConfigPage, Ui::IndexConfigPage
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA( IID "org.macgitver.Module/0.1" FILE "Module.json" )
-    Q_INTERFACES( Module )
 
 public:
-    IndexModule();
+    IndexConfigPage( ConfigDialog* dlg );
+    ~IndexConfigPage();
 
 public:
-    void setupConfigPages( ConfigDialog* dialog );
+    void apply();
+    void init();
 
-    void initialize();
-    void deinitialize();
+    QByteArray pageId() const;
+    QByteArray groupId() const;
 
-private:
-    static Heaven::View* createIndexView();
+    QString pageName() const;
+    QString groupName() const;
+
+private slots:
+    void onLayoutChanged( int newPos );
 };
 
 #endif

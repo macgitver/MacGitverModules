@@ -20,9 +20,15 @@
 
 #include "IndexModule.h"
 #include "IndexView.h"
+#include "IndexConfigPage.h"
 
 IndexModule::IndexModule()
 {
+}
+
+void IndexModule::setupConfigPages(ConfigDialog *dialog)
+{
+    dialog->addPage( new IndexConfigPage( dialog ) );
 }
 
 Heaven::View* IndexModule::createIndexView()
