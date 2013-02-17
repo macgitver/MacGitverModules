@@ -21,10 +21,18 @@
 
 #include "libGitWrap/Repository.hpp"
 
+#include "IndexDlg.h"
+
 #include "hic_IndexViewActions.h"
 
-class IndexDlg;
+#include <QListView>
+#include <QPlainTextEdit>
+#include <QStandardItemModel>
 
+namespace Heaven
+{
+    class MiniSplitter;
+}
 
 class IndexView : public Heaven::GlobalView, private IndexViewActions
 {
@@ -36,7 +44,22 @@ private slots:
     void repositoryChanged( Git::Repository repo );
 
 private:
-    IndexDlg *                          mIndexView;
+    void configChanged( const QString& subPath, const QVariant& value );
+
+    void initSplitters();
+
+private:
+    Heaven::MiniSplitter *  mVertSplit;
+    Heaven::MiniSplitter *  mHorzSplit;
+
+    QListView               mListUnstaged;
+    QListView               mListStaged;
+    QListView               mListDiff;
+    IndexDlg                mDlgCommit;
+
+    QStandardItemModel      mUnstagedModel;
+
+    Git::Repository         mRepo;
 };
 
 #endif

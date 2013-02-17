@@ -14,31 +14,42 @@
  *
  */
 
+#include "IndexView.h"
+
 #include <QVBoxLayout>
 #include <QToolBar>
 
 #include "libMacGitverCore/App/MacGitver.hpp"
 
-#include "IndexView.h"
-#include "IndexDlg.h"
+#include "libHeaven/Widgets/MiniSplitter.h"
+
+#include "libGitWrap/Result.hpp"
+#include "libGitWrap/Repository.hpp"
+#include "libGitWrap/DiffList.hpp"
+#include "libGitWrap/ChangeListConsumer.hpp"
 
 
 IndexView::IndexView()
-    : GlobalView( QLatin1String( "Stage" ) )
-    , mIndexView( new IndexDlg( this ) )
+    : GlobalView( QLatin1String( "Index" ) )
+    , ConfigUser( "History" )
+    , mVertSplit( new Heaven::MiniSplitter( Qt::Vertical ) )
+    , mHorzSplit( new Heaven::MiniSplitter( Qt::Horizontal ) )
 {
-    setViewName( mIndexView->windowTitle() );
+    setViewName( trUtf8("Stage") );
     setupActions( this );
+
+    mDlgCommit.layout()->setMargin( 0 );
 
     QVBoxLayout* l = new QVBoxLayout;
     l->setSpacing( 0 );
     l->setMargin( 0 );
 
     l->addWidget( tbIndexViewToolbar->toolBarFor( this ) );
-    l->addWidget( mIndexView );
 
     setLayout( l );
+    initSplitters();
 
+    mListUnstaged.setModel( &mUnstagedModel );
 
     connect( &MacGitver::self(), SIGNAL(repositoryChanged(Git::Repository)),
              this, SLOT(repositoryChanged(Git::Repository)) );
@@ -48,8 +59,48 @@ IndexView::IndexView()
 
 void IndexView::repositoryChanged( Git::Repository repo )
 {
-    if( repo.isValid() )
+    if( !repo.isValid() )
     {
-        mIndexView->updateIndex( repo );
+        return;
+    }
+
+    Git::Result r;
+    Git::DiffList diffIndex = repo.diffIndexToWorkingDir(r);
+
+    foreach( const Git::ChangeListEntry &c, diffIndex.changeList(r) )
+    {
+        QStandardItem * it = new QStandardItem( c.newPath );
+        it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
+
+        mUnstagedModel.appendRow( it );
+    }
+}
+
+void IndexView::initSplitters()
+{
+    quint32 i = configGet( "SplitLayout", 0 );
+    switch( i )
+    {
+    default:
+    case 0:
+        mHorzSplit->addWidget( &mListUnstaged );
+        mHorzSplit->addWidget( &mDlgCommit );
+        mHorzSplit->addWidget( &mListStaged );
+
+        mVertSplit->addWidget( &mListDiff );
+        mVertSplit->addWidget( mHorzSplit );
+
+        layout()->addWidget( mVertSplit );
+        break;
+    case 1:
+        mHorzSplit->addWidget( &mListUnstaged );
+        mHorzSplit->addWidget( &mDlgCommit );
+        mHorzSplit->addWidget( &mListStaged );
+
+        mVertSplit->addWidget( mHorzSplit );
+        mVertSplit->addWidget( &mListDiff );
+
+        layout()->addWidget( mVertSplit );
+        break;
     }
 }

@@ -16,35 +16,8 @@
 
 #include "IndexDlg.h"
 
-#include "IndexDelegate.h"
-
-#include "libGitWrap/ObjectId.hpp"
-#include "libGitWrap/Result.hpp"
-#include "libGitWrap/Repository.hpp"
-#include "libGitWrap/DiffList.hpp"
-#include "libGitWrap/Reference.hpp"
-#include "libGitWrap/ObjectTree.hpp"
-
-
 IndexDlg::IndexDlg(QWidget *parent)
+    : QDialog(parent)
 {
     setupUi( this );
-
-    setWindowTitle( trUtf8( "Stage" ) );
-
-    listUnstaged->setModel( &mTestModel );
-}
-
-void IndexDlg::updateIndex( Git::Repository repo)
-{
-    Git::Result r;
-    Git::DiffList diffIndex = repo.diffIndexToWorkingDir(r);
-
-    foreach( const Git::ChangeListEntry &c, diffIndex.changeList(r))
-    {
-        QStandardItem * it = new QStandardItem( c.newPath );
-        it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
-
-        mTestModel.appendRow( it );
-    }
 }

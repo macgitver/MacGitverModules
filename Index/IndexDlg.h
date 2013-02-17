@@ -19,30 +19,11 @@
 
 #include "ui_IndexDlg.h"
 
-#include <QStandardItemModel>
-
-#include "libGitWrap/ChangeListConsumer.hpp"
-
-namespace Git
-{
-    class Repository;
-}
-
 class IndexDlg : public QDialog, private Ui::IndexDlg
 {
     Q_OBJECT
 public:
     IndexDlg(QWidget *parent = 0);
-
-    void updateIndex( Git::Repository repo );
-
-private slots:
-
-private:
-
-private:
-    QStandardItemModel mTestModel;
-
 };
 
 #endif
