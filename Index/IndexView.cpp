@@ -23,6 +23,8 @@
 
 #include "libHeaven/Widgets/MiniSplitter.h"
 
+#include "libGitWrap/Index.hpp"
+#include "libGitWrap/IndexEntry.hpp"
 #include "libGitWrap/Result.hpp"
 #include "libGitWrap/Repository.hpp"
 #include "libGitWrap/DiffList.hpp"
@@ -50,6 +52,7 @@ IndexView::IndexView()
     initSplitters();
 
     mListUnstaged.setModel( &mUnstagedModel );
+    mListStaged.setModel( &mStagedModel );
 
     connect( &MacGitver::self(), SIGNAL(repositoryChanged(Git::Repository)),
              this, SLOT(repositoryChanged(Git::Repository)) );
@@ -73,6 +76,18 @@ void IndexView::repositoryChanged( Git::Repository repo )
         it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
 
         mUnstagedModel.appendRow( it );
+    }
+
+    Git::Index index = repo.index(r);
+    index.read(r);
+    for (int i=0; i < index.count(r); ++i)
+    {
+        Git::IndexEntry e( index.getEntry(i, r) );
+
+        QStandardItem * it = new QStandardItem( e.path() );
+        it->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
+
+        mStagedModel.appendRow( it );
     }
 }
 

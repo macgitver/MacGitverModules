@@ -36,6 +36,10 @@ namespace Heaven
     class MiniSplitter;
 }
 
+/**
+ * @ingroup MacGitver
+ * @brief The IndexView class visualizes the Git index (aka "stage").
+ */
 class IndexView : public Heaven::GlobalView, private IndexViewActions, private ConfigUser
 {
     Q_OBJECT
@@ -60,6 +64,7 @@ private:
     IndexDlg                mDlgCommit;
 
     QStandardItemModel      mUnstagedModel;
+    QStandardItemModel      mStagedModel;
 
     Git::Repository         mRepo;
 };
