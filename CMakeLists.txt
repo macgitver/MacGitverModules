@@ -78,6 +78,7 @@ INCLUDE_DIRECTORIES(
     ${libMacGitverCore_includes}
 )
 
+ADD_SUBDIRECTORY( CustomCommands )
 ADD_SUBDIRECTORY( History )
 ADD_SUBDIRECTORY( GitConfig )
 ADD_SUBDIRECTORY( RefsViews )
