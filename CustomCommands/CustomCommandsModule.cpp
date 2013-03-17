@@ -31,14 +31,14 @@ Heaven::View* CustomCommandsModule::createCustomCommandsView()
 
 void CustomCommandsModule::initialize()
 {
-    registerView( QLatin1String( "Custom_Commands" ),
-                  Heaven::GlobalViewType,
+    registerView( "Custom_Commands",
+                  trUtf8( "Custom Commands" ),
                   &CustomCommandsModule::createCustomCommandsView );
 }
 
 void CustomCommandsModule::deinitialize()
 {
-    unregisterView( QLatin1String( "Custom_Commands" ) );
+    unregisterView( "Custom_Commands" );
 }
 
 void CustomCommandsModule::setupConfigPages( ConfigDialog* dialog )

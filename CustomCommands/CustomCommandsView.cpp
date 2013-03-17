@@ -20,7 +20,7 @@
 #include "CustomCommandsView.hpp"
 
 CustomCommandsView::CustomCommandsView()
-    : View( QLatin1String( "Log" ) )
+    : View( "Log" )
 {
     setViewName( trUtf8( "Log" ) );
 

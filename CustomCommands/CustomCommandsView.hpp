@@ -17,7 +17,7 @@
 #ifndef MGV_CUSTOM_COMMANDS_VIEW_HPP
 #define MGV_CUSTOM_COMMANDS_VIEW_HPP
 
-#include "libHeaven/Views/View.h"
+#include "libHeaven/CentralUI/Views/View.hpp"
 
 class QTextBrowser;
 
