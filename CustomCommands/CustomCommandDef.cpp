@@ -16,9 +16,15 @@
 *
 */
 
+#include <QDomElement>
+
 #include "CustomCommandDef.hpp"
 
 CustomCommandDef::CustomCommandDef()
+{
+}
+
+CustomCommandDef::CustomCommandDef( const QDomElement& elSelf )
 {
 }
 
@@ -105,4 +111,22 @@ void CustomCommandDef::setUseCustomWorkingDir( bool useCustomWorkingDir )
 void CustomCommandDef::setCustomWorkingDir( const QString& dir )
 {
     mWorkDir = dir;
+}
+
+void CustomCommandDef::saveTo( QDomElement& elParent )
+{
+    QDomDocument doc = elParent.ownerDocument();
+    QDomElement el = doc.createElement( QLatin1String( "Command" ) );
+
+    el.setAttribute( QLatin1String( "Name" ), mName );
+    el.setAttribute( QLatin1String( "RunModal" ), mRunModal ? 1 : 0 );
+    el.setAttribute( QLatin1String( "RefreshType" ), int( mRefresh ) );
+    el.setAttribute( QLatin1String( "ExecuteOn" ), int( mExecute ) );
+    el.setAttribute( QLatin1String( "UseWD" ), mCustomWorkDir ? 1 : 0 );
+    el.setAttribute( QLatin1String( "WD" ), mWorkDir );
+
+    elParent.appendChild( el );
+
+    QDomCDATASection cmd = doc.createCDATASection( mCommand );
+    el.appendChild( cmd );
 }

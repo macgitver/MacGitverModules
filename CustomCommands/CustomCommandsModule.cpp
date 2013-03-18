@@ -17,6 +17,12 @@
  */
 
 #include <QtPlugin>
+#include <QStringBuilder>
+#include <QFile>
+#include <QDomDocument>
+#include <QDomElement>
+
+#include "libHeaven/App/Application.hpp"
 
 #include "CustomCommandsModule.hpp"
 #include "CustomCommandsView.hpp"
@@ -31,9 +37,21 @@ Heaven::View* CustomCommandsModule::createCustomCommandsView()
     return new CustomCommandsView();
 }
 
+CustomCommandsModule& CustomCommandsModule::self()
+{
+    Q_ASSERT( sSelf );
+    return *sSelf;
+}
+
+CustomCommandsModule* CustomCommandsModule::sSelf = NULL;
+
 void CustomCommandsModule::initialize()
 {
+    Q_ASSERT( sSelf == NULL );
+    sSelf = this;
     setupActions( this );
+    loadCommands();
+
     acCustComAC->mergeInto( "CustomToolsMP" );
 
     registerView( "Custom_Commands",
@@ -44,6 +62,7 @@ void CustomCommandsModule::initialize()
 void CustomCommandsModule::deinitialize()
 {
     unregisterView( "Custom_Commands" );
+    sSelf = NULL;
 }
 
 void CustomCommandsModule::setupConfigPages( ConfigDialog* dialog )
@@ -54,6 +73,50 @@ void CustomCommandsModule::setupConfigPages( ConfigDialog* dialog )
 void CustomCommandsModule::onMergeExecuteOnBranch( Heaven::DynamicActionMerger* dam )
 {
     dam->addAction( new QAction( QLatin1String( "&Foo" ), this ) );
+}
+
+void CustomCommandsModule::loadCommands()
+{
+}
+
+void CustomCommandsModule::saveCommands()
+{
+    QString fn = commandsFileName();
+
+    QDomDocument doc( QLatin1String( "CustomCommands" ) );
+    QDomElement elRoot = doc.createElement( QLatin1String( "CustomCommands" ) );
+    doc.appendChild( elRoot );
+
+    foreach( CustomCommandDef::Ptr cmd, mCommands )
+    {
+        cmd->saveTo( elRoot );
+    }
+
+    QString xml = doc.toString();
+
+    QFile f( fn );
+    if( !f.open( QFile::WriteOnly ) )
+    {
+        return;
+    }
+    f.write( xml.toUtf8() );
+}
+
+QString CustomCommandsModule::commandsFileName() const
+{
+    QString base = Heaven::Application::dataPath();
+    return base % QLatin1Literal( "/commands.xml" );
+}
+
+CustomCommandDef::List CustomCommandsModule::commands() const
+{
+    return mCommands;
+}
+
+void CustomCommandsModule::setCommands( const CustomCommandDef::List& commands )
+{
+    mCommands = commands;
+    saveCommands();
 }
 
 #if QT_VERSION < 0x050000

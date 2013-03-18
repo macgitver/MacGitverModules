@@ -21,6 +21,9 @@
 
 #include <QSharedData>
 #include <QString>
+#include <QList>
+
+class QDomElement;
 
 class CustomCommandDef : public QSharedData
 {
@@ -47,9 +50,11 @@ public:
 
 public:
     typedef QExplicitlySharedDataPointer< CustomCommandDef > Ptr;
+    typedef QList< Ptr > List;
 
 public:
     CustomCommandDef();
+    CustomCommandDef( const QDomElement& elSelf );
     CustomCommandDef( const CustomCommandDef& other );
     ~CustomCommandDef();
 
@@ -69,6 +74,9 @@ public:
     void setRefreshType( RefreshType type );
     void setUseCustomWorkingDir( bool useCustomWorkingDir );
     void setCustomWorkingDir( const QString& dir );
+
+public:
+    void saveTo( QDomElement& elParent );
 
 private:
     QString     mName;

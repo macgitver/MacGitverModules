@@ -21,7 +21,10 @@
 
 #include "libMacGitverCore/Config/Ui/ConfigDialog.hpp"
 
+#include "CustomCommandDef.hpp"
 #include "ui_CustomCommandListCfgPage.h"
+
+class QStandardItemModel;
 
 class CustomCommandListCfgPage : public ConfigPage, Ui::CustomCommandListCfgPage
 {
@@ -46,6 +49,15 @@ private slots:
     void onEdit();
     void onRemove();
     void onCopy();
+
+private:
+    void readCommands();
+    void addCommand( CustomCommandDef::Ptr cmd, bool select = false );
+    static QString execText( CustomCommandDef::ExecuteOn exec );
+
+private:
+    CustomCommandDef::List  mCommands;
+    QStandardItemModel*     mModel;
 };
 
 #endif

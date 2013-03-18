@@ -80,5 +80,14 @@ CustomCommandDef::Ptr EditCustomCommandDlg::getData( bool overWriteTemplate )
         data = new CustomCommandDef;
     }
 
+    data->setName( txtCommandName->text() );
+    data->setCommand( txtCommands->toPlainText() );
+    data->setRunModal( chkRunModal->isChecked() );
+    data->setRefreshType( CustomCommandDef::RefreshType( mRefreshGroup->checkedId() ) );
+    data->setExecuteOn( CustomCommandDef::ExecuteOn( cboContext->itemData(
+                                                         cboContext->currentIndex() ).toInt() ) );
+    data->setUseCustomWorkingDir( chkCustomWD->isChecked() );
+    data->setCustomWorkingDir( txtWorkingDirectory->text() );
+
     return data;
 }

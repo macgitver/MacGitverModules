@@ -23,6 +23,7 @@
 
 class CustomCommandsView;
 
+#include "CustomCommandDef.hpp"
 #include "hic_CustomCommandActions.h"
 
 class CustomCommandsModule : public Module, private CustomCommandActions
@@ -30,20 +31,30 @@ class CustomCommandsModule : public Module, private CustomCommandActions
     Q_OBJECT
     Q_PLUGIN_METADATA( IID "org.macgitver.Module/0.1" FILE "Module.json" )
     Q_INTERFACES( Module )
-
 public:
     CustomCommandsModule();
+    static CustomCommandsModule& self();
 
 public:
     void initialize();
     void deinitialize();
     void setupConfigPages( ConfigDialog* dialog );
 
+    CustomCommandDef::List commands() const;
+    void setCommands( const CustomCommandDef::List& commands );
+
 private slots:
     void onMergeExecuteOnBranch( Heaven::DynamicActionMerger* dam );
 
 private:
     static Heaven::View* createCustomCommandsView();
+    void loadCommands();
+    void saveCommands();
+    QString commandsFileName() const;
+
+private:
+    static CustomCommandsModule* sSelf;
+    CustomCommandDef::List  mCommands;
 };
 
 #endif
