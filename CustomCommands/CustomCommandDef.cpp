@@ -26,6 +26,31 @@ CustomCommandDef::CustomCommandDef()
 
 CustomCommandDef::CustomCommandDef( const QDomElement& elSelf )
 {
+    mName = elSelf.attribute( QLatin1String( "Name" ) );
+    mRunModal = elSelf.attribute( QLatin1String( "RunModal" ), QLatin1String( "0" ) )
+            == QLatin1String( "1" );
+
+    mRefresh = RefreshType( elSelf.attribute( QLatin1String( "RefreshType" ),
+                                              QLatin1String( "0" ) ).toInt() );
+
+    mExecute = ExecuteOn( elSelf.attribute( QLatin1String( "ExecuteOn" ),
+                                            QLatin1String( "0" ) ).toInt() );
+
+    mWorkDir = elSelf.attribute( QLatin1String( "WD" ) );
+    mCustomWorkDir = elSelf.attribute( QLatin1String( "UseWD" ), QLatin1String( "0" ) )
+            == QLatin1String( "1" );
+
+    QDomNode child = elSelf.firstChild();
+    if( child.isCDATASection() )
+    {
+        QDomCDATASection cds = child.toCDATASection();
+        mCommand = cds.data();
+    }
+    else if( child.isText() )
+    {
+        QDomText txt = child.toText();
+        mCommand = txt.data();
+    }
 }
 
 CustomCommandDef::CustomCommandDef( const CustomCommandDef& other )

@@ -77,6 +77,23 @@ void CustomCommandsModule::onMergeExecuteOnBranch( Heaven::DynamicActionMerger* 
 
 void CustomCommandsModule::loadCommands()
 {
+    QString fn = commandsFileName();
+    QFile f( fn );
+    if( !f.open( QFile::ReadOnly ) )
+    {
+        return;
+    }
+
+    QDomDocument doc;
+    doc.setContent( &f );
+    QDomElement el = doc.documentElement().firstChildElement();
+    while( el.isElement() )
+    {
+        CustomCommandDef::Ptr cmd = CustomCommandDef::Ptr( new CustomCommandDef( el ) );
+        mCommands.append( cmd );
+
+        el = el.nextSiblingElement();
+    }
 }
 
 void CustomCommandsModule::saveCommands()
