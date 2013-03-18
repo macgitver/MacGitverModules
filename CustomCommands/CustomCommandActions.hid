@@ -16,36 +16,16 @@
  *
  */
 
-#ifndef MGV_CUSCOM_CONFIG_PAGE_HPP
-#define MGV_CUSCOM_CONFIG_PAGE_HPP
+Ui CustomCommandActions {
 
-#include "libMacGitverCore/Config/Ui/ConfigDialog.hpp"
+    Container CustComAC {
 
-#include "ui_CustomCommandListCfgPage.h"
+        Menu ExecuteOnRepo {
+            Text "R&epository";
+            DynamicActionMerger ExecOnBranch { Merger onMergeExecuteOnBranch; };
+        };
+        Separator;
+        DynamicActionMerger ExecGlobally { Merger onMergeExecuteGlobally; };
+    };
 
-class CustomCommandListCfgPage : public ConfigPage, Ui::CustomCommandListCfgPage
-{
-    Q_OBJECT
-
-public:
-    CustomCommandListCfgPage( ConfigDialog* dlg );
-    ~CustomCommandListCfgPage();
-
-public:
-    void apply();
-    void init();
-
-    QByteArray pageId() const;
-    QByteArray groupId() const;
-
-    QString pageName() const;
-    QString groupName() const;
-
-private slots:
-    void onAdd();
-    void onEdit();
-    void onRemove();
-    void onCopy();
 };
-
-#endif

@@ -1,6 +1,8 @@
 /*
  * MacGitver
- * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
+ * Copyright (C) 2012-2013 The MacGitver-Developers <dev@macgitver.org>
+ *
+ * (C) Sascha Cunz <sascha@macgitver.org>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -31,6 +33,9 @@ Heaven::View* CustomCommandsModule::createCustomCommandsView()
 
 void CustomCommandsModule::initialize()
 {
+    setupActions( this );
+    acCustComAC->mergeInto( "CustomToolsMP" );
+
     registerView( "Custom_Commands",
                   trUtf8( "Custom Commands" ),
                   &CustomCommandsModule::createCustomCommandsView );
@@ -44,6 +49,11 @@ void CustomCommandsModule::deinitialize()
 void CustomCommandsModule::setupConfigPages( ConfigDialog* dialog )
 {
     dialog->addPage( new CustomCommandListCfgPage( dialog ) );
+}
+
+void CustomCommandsModule::onMergeExecuteOnBranch( Heaven::DynamicActionMerger* dam )
+{
+    dam->addAction( new QAction( QLatin1String( "&Foo" ), this ) );
 }
 
 #if QT_VERSION < 0x050000

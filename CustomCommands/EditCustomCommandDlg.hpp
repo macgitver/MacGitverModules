@@ -16,36 +16,33 @@
  *
  */
 
-#ifndef MGV_CUSCOM_CONFIG_PAGE_HPP
-#define MGV_CUSCOM_CONFIG_PAGE_HPP
+#ifndef MGV_CUSCOM_EDIT_DLG_HPP
+#define MGV_CUSCOM_EDIT_DLG_HPP
 
-#include "libMacGitverCore/Config/Ui/ConfigDialog.hpp"
+#include "ui_EditCustomCommandDlg.h"
 
-#include "ui_CustomCommandListCfgPage.h"
+#include "CustomCommandDef.hpp"
 
-class CustomCommandListCfgPage : public ConfigPage, Ui::CustomCommandListCfgPage
+class EditCustomCommandDlg : public QDialog, private Ui::EditCustomCommandDlg
 {
     Q_OBJECT
-
 public:
-    CustomCommandListCfgPage( ConfigDialog* dlg );
-    ~CustomCommandListCfgPage();
+    EditCustomCommandDlg( QWidget* parent,
+                          CustomCommandDef::Ptr cmdTemplate = CustomCommandDef::Ptr() );
 
-public:
-    void apply();
+private:
     void init();
+    void loadTemplate();
 
-    QByteArray pageId() const;
-    QByteArray groupId() const;
+public:
+    CustomCommandDef::Ptr getData( bool overWriteTemplate = true );
 
-    QString pageName() const;
-    QString groupName() const;
-
-private slots:
-    void onAdd();
-    void onEdit();
-    void onRemove();
-    void onCopy();
+private:
+    CustomCommandDef::Ptr   mCmdTemplate;
+    QButtonGroup*           mRunGroup;
+    QButtonGroup*           mRefreshGroup;
 };
 
 #endif
+
+

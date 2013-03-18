@@ -1,6 +1,8 @@
 /*
  * MacGitver
- * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
+ * Copyright (C) 2012-2013 The MacGitver-Developers <dev@macgitver.org>
+ *
+ * (C) Sascha Cunz <sascha@macgitver.org>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -15,6 +17,7 @@
  */
 
 #include "CustomCommandListCfgPage.hpp"
+#include "EditCustomCommandDlg.hpp"
 
 CustomCommandListCfgPage::CustomCommandListCfgPage( ConfigDialog* dlg )
     : ConfigPage( dlg )
@@ -33,6 +36,10 @@ void CustomCommandListCfgPage::apply()
 
 void CustomCommandListCfgPage::init()
 {
+    connect( cmdAdd, SIGNAL(clicked()), this, SLOT(onAdd()) );
+    connect( cmdCopy, SIGNAL(clicked()), this, SLOT(onCopy()) );
+    connect( cmdEdit, SIGNAL(clicked()), this, SLOT(onEdit()) );
+    connect( cmdRemove, SIGNAL(clicked()), this, SLOT(onRemove()) );
 }
 
 QByteArray CustomCommandListCfgPage::pageId() const
@@ -55,3 +62,23 @@ QString CustomCommandListCfgPage::groupName() const
     return trUtf8( "Gerneral" );
 }
 
+void CustomCommandListCfgPage::onAdd()
+{
+    EditCustomCommandDlg d( this );
+    if( d.exec() )
+    {
+        /* update this */
+    }
+}
+
+void CustomCommandListCfgPage::onEdit()
+{
+}
+
+void CustomCommandListCfgPage::onRemove()
+{
+}
+
+void CustomCommandListCfgPage::onCopy()
+{
+}

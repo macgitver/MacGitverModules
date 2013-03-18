@@ -13,6 +13,8 @@ SET( SRC_FILES
     CustomCommandsView.cpp
     CustomCommandsModule.cpp
     CustomCommandListCfgPage.cpp
+    EditCustomCommandDlg.cpp
+    CustomCommandDef.cpp
 )
 
 SET( HDR_FILES
@@ -20,6 +22,8 @@ SET( HDR_FILES
     CustomCommandsView.hpp
     CustomCommandsModule.hpp
     CustomCommandListCfgPage.hpp
+    EditCustomCommandDlg.hpp
+    CustomCommandDef.hpp
 )
 
 SET( UI_FILES
@@ -28,6 +32,12 @@ SET( UI_FILES
     CustomCommandListCfgPage.ui
 )
 
+SET( HID_FILES
+    CustomCommandActions.hid
+)
+
+
+HIC( HIC_FILES ${HID_FILES} )
 QT_UIC( UIC_FILES ${UI_FILES} )
 QT_MOC( MOC_FILES ${HDR_FILES} )
 
@@ -38,6 +48,7 @@ ADD_MGV_MODULE(
     ${HDR_FILES}
     ${MOC_FILES}
     ${UIC_FILES} ${UI_FILES}
+    ${HIC_FILES} ${HID_FILES}
 )
 
 MSVC_SPLIT_SOURCES( ModCustomCommands )

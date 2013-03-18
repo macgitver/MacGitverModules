@@ -1,6 +1,8 @@
 /*
  * MacGitver
- * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
+ * Copyright (C) 2012-2013 The MacGitver-Developers <dev@macgitver.org>
+ *
+ * (C) Sascha Cunz <sascha@macgitver.org>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -21,7 +23,9 @@
 
 class CustomCommandsView;
 
-class CustomCommandsModule : public Module
+#include "hic_CustomCommandActions.h"
+
+class CustomCommandsModule : public Module, private CustomCommandActions
 {
     Q_OBJECT
     Q_PLUGIN_METADATA( IID "org.macgitver.Module/0.1" FILE "Module.json" )
@@ -34,6 +38,9 @@ public:
     void initialize();
     void deinitialize();
     void setupConfigPages( ConfigDialog* dialog );
+
+private slots:
+    void onMergeExecuteOnBranch( Heaven::DynamicActionMerger* dam );
 
 private:
     static Heaven::View* createCustomCommandsView();

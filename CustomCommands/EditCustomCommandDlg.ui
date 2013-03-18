@@ -34,12 +34,15 @@
        </widget>
       </item>
       <item row="0" column="1" colspan="2">
-       <widget class="QLineEdit" name="txtCommandName">
+       <widget class="LineEdit" name="txtCommandName">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="mandatory" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -206,6 +209,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>libMacGitverCore/Widgets/LineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>txtCommandName</tabstop>
   <tabstop>cboContext</tabstop>
