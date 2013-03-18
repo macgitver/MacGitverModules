@@ -16,16 +16,20 @@
 *
 */
 
+#include <QUuid>
 #include <QDomElement>
 
 #include "CustomCommandDef.hpp"
 
 CustomCommandDef::CustomCommandDef()
 {
+    newId();
 }
 
 CustomCommandDef::CustomCommandDef( const QDomElement& elSelf )
 {
+    mId = elSelf.attribute( QLatin1String( "Id" ), QUuid::createUuid().toString() );
+
     mName = elSelf.attribute( QLatin1String( "Name" ) );
     mRunModal = elSelf.attribute( QLatin1String( "RunModal" ), QLatin1String( "0" ) )
             == QLatin1String( "1" );
@@ -55,6 +59,7 @@ CustomCommandDef::CustomCommandDef( const QDomElement& elSelf )
 
 CustomCommandDef::CustomCommandDef( const CustomCommandDef& other )
 {
+    mId             = other.mId;
     mName           = other.mName;
     mCommand        = other.mCommand;
     mExecute        = other.mExecute;
@@ -66,6 +71,16 @@ CustomCommandDef::CustomCommandDef( const CustomCommandDef& other )
 
 CustomCommandDef::~CustomCommandDef()
 {
+}
+
+void CustomCommandDef::newId()
+{
+    mId = QUuid::createUuid().toString();
+}
+
+QString CustomCommandDef::id() const
+{
+    return mId;
 }
 
 QString CustomCommandDef::name() const
@@ -101,6 +116,11 @@ bool CustomCommandDef::useCustomWorkingDir() const
 QString CustomCommandDef::customWorkingDir() const
 {
     return mWorkDir;
+}
+
+void CustomCommandDef::setId( const QString& id )
+{
+    mId = id;
 }
 
 void CustomCommandDef::setName( const QString& name )
@@ -149,6 +169,7 @@ void CustomCommandDef::saveTo( QDomElement& elParent )
     el.setAttribute( QLatin1String( "ExecuteOn" ), int( mExecute ) );
     el.setAttribute( QLatin1String( "UseWD" ), mCustomWorkDir ? 1 : 0 );
     el.setAttribute( QLatin1String( "WD" ), mWorkDir );
+    el.setAttribute( QLatin1String( "Id" ), mId );
 
     elParent.appendChild( el );
 

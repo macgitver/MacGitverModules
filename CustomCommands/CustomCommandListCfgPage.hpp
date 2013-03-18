@@ -52,7 +52,9 @@ private slots:
 
 private:
     void readCommands();
+    CustomCommandDef::Ptr findCommand( const QString& id ) const;
     void addCommand( CustomCommandDef::Ptr cmd, bool select = false );
+    void updateCommand( CustomCommandDef::Ptr cmd );
     static QString execText( CustomCommandDef::ExecuteOn exec );
 
 private:

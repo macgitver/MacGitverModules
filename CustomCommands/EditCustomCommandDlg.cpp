@@ -20,11 +20,14 @@
 
 #include "EditCustomCommandDlg.hpp"
 
-EditCustomCommandDlg::EditCustomCommandDlg( QWidget* parent, CustomCommandDef::Ptr cmdTemplate  )
+EditCustomCommandDlg::EditCustomCommandDlg( QWidget*                parent,
+                                            const QString&          title,
+                                            CustomCommandDef::Ptr   cmdTemplate )
     : QDialog( parent )
     , mCmdTemplate( cmdTemplate )
 {
     init();
+    setWindowTitle( title );
 }
 
 void EditCustomCommandDlg::init()
@@ -63,12 +66,21 @@ void EditCustomCommandDlg::init()
                          CustomCommandDef::ExecInWorkingTree );
     cboContext->addItem( trUtf8( "Execute gobally" ),
                          CustomCommandDef::ExecGlobally );
+
+    loadTemplate();
 }
 
 void EditCustomCommandDlg::loadTemplate()
 {
     if( mCmdTemplate.data() )
     {
+        txtCommandName->setText( mCmdTemplate->name() );
+        txtCommands->setPlainText( mCmdTemplate->command() );
+        cboContext->setCurrentIndex( cboContext->findData( mCmdTemplate->executeOn() ) );
+        mRefreshGroup->button( mCmdTemplate->refreshType() )->setChecked( true );
+        mRunGroup->button( mCmdTemplate->runModal() )->setChecked( true );
+        chkCustomWD->setChecked( mCmdTemplate->useCustomWorkingDir() );
+        txtWorkingDirectory->setText( mCmdTemplate->customWorkingDir() );
     }
 }
 

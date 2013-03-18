@@ -28,6 +28,7 @@ class EditCustomCommandDlg : public QDialog, private Ui::EditCustomCommandDlg
     Q_OBJECT
 public:
     EditCustomCommandDlg( QWidget* parent,
+                          const QString& title,
                           CustomCommandDef::Ptr cmdTemplate = CustomCommandDef::Ptr() );
 
 private:

@@ -59,6 +59,7 @@ public:
     ~CustomCommandDef();
 
 public:
+    QString id() const;
     QString name() const;
     QString command() const;
     ExecuteOn executeOn() const;
@@ -67,6 +68,8 @@ public:
     bool useCustomWorkingDir() const;
     QString customWorkingDir() const;
 
+    void newId();
+    void setId( const QString& id );
     void setName( const QString& name );
     void setCommand( const QString& command );
     void setExecuteOn( ExecuteOn execOn );
@@ -79,6 +82,7 @@ public:
     void saveTo( QDomElement& elParent );
 
 private:
+    QString     mId;
     QString     mName;
     QString     mCommand;
     ExecuteOn   mExecute;

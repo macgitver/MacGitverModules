@@ -16,6 +16,7 @@
  *
  */
 
+#include <QDebug>
 #include <QStandardItemModel>
 
 #include "CustomCommandListCfgPage.hpp"
@@ -80,7 +81,7 @@ QString CustomCommandListCfgPage::groupName() const
 
 void CustomCommandListCfgPage::onAdd()
 {
-    EditCustomCommandDlg d( this );
+    EditCustomCommandDlg d( this, trUtf8( "Create custom command" ) );
     if( d.exec() )
     {
         CustomCommandDef::Ptr cmd = d.getData( false );
@@ -92,6 +93,27 @@ void CustomCommandListCfgPage::onAdd()
 
 void CustomCommandListCfgPage::onEdit()
 {
+    QModelIndex idx = treeView->selectionModel()->currentIndex();
+    if( !idx.isValid() )
+    {
+        return;
+    }
+
+    QStandardItem* parent = mModel->invisibleRootItem();
+    QStandardItem* it = parent->child( idx.row() );
+    Q_ASSERT( it );
+
+    QString id = it->data().toString();
+    CustomCommandDef::Ptr cmd = findCommand( id );
+    Q_ASSERT( cmd );
+
+    EditCustomCommandDlg d( this, trUtf8( "Edit custom command" ), cmd );
+    if( d.exec() )
+    {
+        d.getData( true );
+        updateCommand( cmd );
+        setModified();
+    }
 }
 
 void CustomCommandListCfgPage::onRemove()
@@ -133,6 +155,43 @@ void CustomCommandListCfgPage::addCommand( CustomCommandDef::Ptr cmd, bool selec
     QList< QStandardItem* > row;
     row << new QStandardItem( cmd->name() );
     row << new QStandardItem( execText( cmd->executeOn() ) );
+    row[ 0 ]->setData( cmd->id() );
     mModel->appendRow( row );
 }
 
+void CustomCommandListCfgPage::updateCommand( CustomCommandDef::Ptr cmd )
+{
+    if( !cmd )
+    {
+        return;
+    }
+
+    QString id = cmd->id();
+    QStandardItem* parent = mModel->invisibleRootItem();
+    for( int i = 0; i < parent->rowCount(); ++i )
+    {
+        QStandardItem* it = parent->child( i );
+        if( it->data().toString() == id )
+        {
+            it->setText( cmd->name() );
+            it = parent->child( i, 1 );
+            it->setText( execText( cmd->executeOn() ) );
+            return;
+        }
+    }
+
+    addCommand( cmd );
+}
+
+CustomCommandDef::Ptr CustomCommandListCfgPage::findCommand( const QString& id ) const
+{
+    for( int i = 0; i < mCommands.count(); ++i )
+    {
+        if( mCommands[ i ]->id() == id )
+        {
+            return mCommands[ i ];
+        }
+    }
+
+    return CustomCommandDef::Ptr();
+}
