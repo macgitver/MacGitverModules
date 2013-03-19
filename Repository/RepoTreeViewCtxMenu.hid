@@ -34,6 +34,8 @@ Ui RepoTreeViewCtxMenu {
 
         Action      Activate;
         Separator;
+        MergePlace  RepoRootCtx;
+        Separator;
         Action      Close;
 
     };
@@ -41,6 +43,8 @@ Ui RepoTreeViewCtxMenu {
     Menu CtxMenuSMRepo {
 
         Action      Activate;
+        Separator;
+        MergePlace  RepoSubCtx;
 
     };
 
