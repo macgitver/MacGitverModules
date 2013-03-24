@@ -122,6 +122,28 @@ void CustomCommandListCfgPage::onRemove()
 
 void CustomCommandListCfgPage::onCopy()
 {
+    QModelIndex idx = treeView->selectionModel()->currentIndex();
+    if( !idx.isValid() )
+    {
+        return;
+    }
+
+    QStandardItem* parent = mModel->invisibleRootItem();
+    QStandardItem* it = parent->child( idx.row() );
+    Q_ASSERT( it );
+
+    QString id = it->data().toString();
+    CustomCommandDef::Ptr cmd = findCommand( id );
+    Q_ASSERT( cmd );
+
+    EditCustomCommandDlg d( this, trUtf8( "Copy custom command" ), cmd );
+    if( d.exec() )
+    {
+        cmd = d.getData( false );
+        mCommands.append( cmd );
+        addCommand( cmd, true );
+        setModified();
+    }
 }
 
 void CustomCommandListCfgPage::readCommands()
