@@ -118,6 +118,28 @@ void CustomCommandListCfgPage::onEdit()
 
 void CustomCommandListCfgPage::onRemove()
 {
+    QModelIndex idx = treeView->selectionModel()->currentIndex();
+    if( !idx.isValid() )
+    {
+        return;
+    }
+
+    QStandardItem* parent = mModel->invisibleRootItem();
+    QStandardItem* it = parent->child( idx.row() );
+    Q_ASSERT( it );
+
+    QString id = it->data().toString();
+    for( int i = 0; i < mCommands.count(); ++i )
+    {
+        if( mCommands[ i ]->id() == id )
+        {
+            mCommands.removeAt( i );
+            setModified();
+
+            parent->removeRow( idx.row() );
+            return;
+        }
+    }
 }
 
 void CustomCommandListCfgPage::onCopy()
