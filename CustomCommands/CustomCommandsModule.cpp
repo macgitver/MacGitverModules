@@ -25,16 +25,10 @@
 #include "libHeaven/App/Application.hpp"
 
 #include "CustomCommandsModule.hpp"
-#include "CustomCommandsView.hpp"
 #include "CustomCommandListCfgPage.hpp"
 
 CustomCommandsModule::CustomCommandsModule()
 {
-}
-
-Heaven::View* CustomCommandsModule::createCustomCommandsView()
-{
-    return new CustomCommandsView();
 }
 
 CustomCommandsModule& CustomCommandsModule::self()
@@ -53,15 +47,10 @@ void CustomCommandsModule::initialize()
     loadCommands();
 
     acCustComAC->mergeInto( "CustomToolsMP" );
-
-    registerView( "Custom_Commands",
-                  trUtf8( "Custom Commands" ),
-                  &CustomCommandsModule::createCustomCommandsView );
 }
 
 void CustomCommandsModule::deinitialize()
 {
-    unregisterView( "Custom_Commands" );
     sSelf = NULL;
 }
 

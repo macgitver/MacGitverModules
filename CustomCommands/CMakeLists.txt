@@ -10,7 +10,6 @@ INCLUDE_DIRECTORIES(
 
 SET( SRC_FILES
 
-    CustomCommandsView.cpp
     CustomCommandsModule.cpp
     CustomCommandListCfgPage.cpp
     EditCustomCommandDlg.cpp
@@ -19,7 +18,6 @@ SET( SRC_FILES
 
 SET( HDR_FILES
 
-    CustomCommandsView.hpp
     CustomCommandsModule.hpp
     CustomCommandListCfgPage.hpp
     EditCustomCommandDlg.hpp

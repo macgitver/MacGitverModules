@@ -21,8 +21,6 @@
 
 #include "libMacGitverCore/MacGitver/Module.h"
 
-class CustomCommandsView;
-
 #include "CustomCommandDef.hpp"
 #include "hic_CustomCommandActions.h"
 
@@ -47,7 +45,6 @@ private slots:
     void onMergeExecuteOnBranch( Heaven::DynamicActionMerger* dam );
 
 private:
-    static Heaven::View* createCustomCommandsView();
     void loadCommands();
     void saveCommands();
     QString commandsFileName() const;
