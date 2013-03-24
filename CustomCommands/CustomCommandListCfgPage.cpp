@@ -57,6 +57,10 @@ void CustomCommandListCfgPage::init()
 
     mCommands = CustomCommandsModule::self().commands();
     readCommands();
+
+    connect( treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+             this, SLOT(onSelectionChanged()) );
+    onSelectionChanged();
 }
 
 QByteArray CustomCommandListCfgPage::pageId() const
@@ -77,6 +81,15 @@ QString CustomCommandListCfgPage::pageName() const
 QString CustomCommandListCfgPage::groupName() const
 {
     return trUtf8( "Gerneral" );
+}
+
+void CustomCommandListCfgPage::onSelectionChanged()
+{
+    QModelIndex idx = treeView->selectionModel()->currentIndex();
+
+    cmdEdit->setEnabled( idx.isValid() );
+    cmdCopy->setEnabled( idx.isValid() );
+    cmdRemove->setEnabled( idx.isValid() );
 }
 
 void CustomCommandListCfgPage::onAdd()

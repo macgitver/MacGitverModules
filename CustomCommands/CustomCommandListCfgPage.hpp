@@ -49,6 +49,7 @@ private slots:
     void onEdit();
     void onRemove();
     void onCopy();
+    void onSelectionChanged();
 
 private:
     void readCommands();
