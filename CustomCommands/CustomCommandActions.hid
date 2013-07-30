@@ -18,15 +18,19 @@
 
 Ui CustomCommandActions {
 
+    Container CustComRepoAC {
+        DynamicActionMerger ExecOnBranch
+        {
+            Merger onMergeExecuteOnBranch;
+        };
+    };
+
     /* This container lands at the bottom part of the 'tools' menu */
     Container CustComAC {
 
         Menu ExecuteOnRepo {
             Text "R&epository";
-            DynamicActionMerger ExecOnBranch
-            {
-                Merger onMergeExecuteOnBranch;
-            };
+            Container CustComRepoAC;
         };
 
         Separator;
