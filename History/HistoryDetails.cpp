@@ -24,10 +24,8 @@
 #include "HistoryDetails.h"
 
 HistoryDetails::HistoryDetails( QWidget* parent )
-    : QTextBrowser( parent )
+    : QWebView( parent )
 {
-    setFrameShape( NoFrame );
-
     readConfig();
 }
 

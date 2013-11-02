@@ -1,7 +1,7 @@
 
 PROJECT( MGV_MOD_HISTORY )
 
-QT_PREPARE( Core Gui Widgets )
+QT_PREPARE( Core Gui Widgets WebKit WebKitWidgets )
 
 INCLUDE_DIRECTORIES(
     ${MGV_MOD_HISTORY_SOURCE_DIR}
