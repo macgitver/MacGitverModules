@@ -5,8 +5,8 @@ margin: 0px;
 padding: 3px;
 }
 
-div#heading {
 border: 1px solid gray;
+div.heading {
 border-bottom: 1px dotted gray;
 border-top-left-radius: 3px;
 border-top-right-radius: 3px;
@@ -27,7 +27,7 @@ border-spacing: 0;
 text-align: left;
 }
 
-td#name {
+td.name {
 font-weight: bold;
 }
 

@@ -87,7 +87,7 @@ static inline QString mkRow( const QString& lbl, const QString& content, bool fi
 {
     QString s = QLatin1String(
                 "<tr>"
-                    "<td id=\"name\">%1:</td>"
+                    "<td class=\"name\">%1:</td>"
                     "<td>%2</td>"
                 "</tr>" );
 
@@ -196,7 +196,7 @@ void HistoryDetails::updateText()
                 "<style type=\"text/css\">%1</style>"
             "</head>"
             "<body>"
-                "<div id=\"heading\">%2</div>"
+                "<div class=\"heading\">%2</div>"
                 "<table>%3</table>"
                 "<pre>%4</pre>"
             "</body>"
