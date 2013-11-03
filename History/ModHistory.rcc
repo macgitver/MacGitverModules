@@ -1,0 +1,6 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="ModHistory">
+    <!--file>CommitDetails.html</file-->
+    <file>commit-detail.css</file>
+ </qresource>
+ </RCC>

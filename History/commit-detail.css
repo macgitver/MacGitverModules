@@ -1,0 +1,44 @@
+body {
+background: white;
+color: black;
+margin: 0px;
+padding: 3px;
+}
+
+div#heading {
+border: 1px solid gray;
+border-bottom: 1px dotted gray;
+border-top-left-radius: 3px;
+border-top-right-radius: 3px;
+font-size: x-large;
+padding: 3px;
+margin: 0;
+background-color: #D8E9FF;
+color: black;
+}
+
+table {
+width: 100%;
+border: 1px solid gray;
+border-top: none;
+border-bottom: 1px dotted gray;
+border-collapse: collapse;
+border-spacing: 0;
+text-align: left;
+}
+
+td#name {
+font-weight: bold;
+}
+
+td {
+padding: 0;
+margin: 0;
+background-color: LightGray; color: black;
+}
+
+/*
+pre {
+$(MGV_DEFAULT_FONT)$
+}
+*/

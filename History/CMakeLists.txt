@@ -46,7 +46,13 @@ SET( HID_FILES
     HistoryViewActions.hid
 )
 
+SET( RCC_FILES
+
+    ModHistory.rcc
+)
+
 CFGCOMP( CFG_FILES HistoryConfig.ccfg )
+QT_RCC( RCC_DATA QRC_FILES ${RCC_FILES} )
 QT_MOC( MOC_FILES ${HDR_FILES} )
 QT_UIC( UIC_FILES ${UI_FILES} )
 HIC( HIC_FILES ${HID_FILES} )
@@ -57,9 +63,11 @@ ADD_MGV_MODULE(
     ${SRC_FILES}
     ${HDR_FILES}
     ${MOC_FILES}
+    ${QRC_FILES}
     ${UIC_FILES} ${UI_FILES}
     ${HIC_FILES} ${HID_FILES}
     ${CFG_FILES}
+    ${RCC_DATA}
 )
 
 TARGET_LINK_LIBRARIES(
