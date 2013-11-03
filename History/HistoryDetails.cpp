@@ -23,6 +23,8 @@
 
 #include "HistoryDetails.h"
 
+#include <QFile>
+
 HistoryDetails::HistoryDetails( QWidget* parent )
     : QWebView( parent )
 {
@@ -49,7 +51,15 @@ void HistoryDetails::readConfig()
         }
     }
 
+    updateStyle();
+
     setCommit( mCurrentSHA1 );
+}
+
+void HistoryDetails::updateStyle()
+{
+    QFile fStyle( QLatin1String(":/ModHistory/commit-detail.css") );
+    mStyle = fStyle.open(QFile::ReadOnly) ? QString::fromUtf8( fStyle.readAll().constData() ) : QString();
 }
 
 void HistoryDetails::setRepository( Git::Repository repo )
@@ -77,25 +87,11 @@ static inline QString mkRow( const QString& lbl, const QString& content, bool fi
 {
     QString s = QLatin1String(
                 "<tr>"
-                    "<td style=\"font-weight:bold;\">"
-                        "%1:"
-                    "</td>"
-                    "<td%3>"
-                        "%2"
-                    "</td>"
+                    "<td id=\"name\">%1:</td>"
+                    "<td>%2</td>"
                 "</tr>" );
 
-    QString styleAdd;
-    if( fixed )
-    {
-        QFont fixed = Config::self().defaultFixedFont();
-        styleAdd = QString( QLatin1String( " style=\"font-family: '%1';font-size: %2pt\"" ) )
-                .arg( fixed.family() )
-                .arg( fixed.pointSize() );
-
-    }
-
-    return s.arg( lbl ).arg( content ).arg( styleAdd );
+    return s.arg( lbl ).arg( content );
 }
 
 void HistoryDetails::updateText()
@@ -194,82 +190,25 @@ void HistoryDetails::updateText()
         body.prepend( QString() );
     }
 
-    QPalette p;
-    QColor clrBackSel = p.color( QPalette::Highlight );
-    QColor clrFrntSel = p.color( QPalette::Text ); // Don't want HighlightedText, probably.
-    QColor clrBackDtl = p.color( QPalette::Window );
-    QColor clrFrntDtl = p.color( QPalette::WindowText );
-    QColor clrBackWnd = p.color( QPalette::Base );
-    QColor clrFrntWnd = p.color( QPalette::Text );
-    QFont fixed = Config::self().defaultFixedFont();
-
     QString html = trUtf8(
         "<html>"
             "<head>"
-//                "<link rel=\"stylesheet\" type=\"text/css\" href=\"qrc:/ModHistory/format.css\"/>"
-                "<style type=\"text/css\">"
-                "div#heading {"
-                    "border: 1px solid %4;"
-                    "border-bottom: 1px dashed %4;"
-                    "font-size: x-large;"
-                    "padding: 3px;"
-                    "margin: 0;"
-                    "background-color: #D8E9FF;"
-                    "color:%2;"
-                    "border-top-left-radius: 10px;"
-                    "border-top-right-radius: 10px;"
-                "}"
-                "table {"
-                    "width:100%;"
-                    "background-color: %1; color: %4;"
-                    "border: 1px solid %4;"
-                    "border-top: none;"
-                    "border-collapse: collapse;"
-                    "text-align: left;"
-                    "border-spacing: 0;"
-                "}"
-                "td {"
-                    "padding: 0;"
-                    "margin: 0;"
-                    "background-color: %3; color:%4;"
-                "}"
-                "pre {"
-                    "font-family: '%10'; font-size: %11pt;"
-                "}"
-                "</style>"
+                "<style type=\"text/css\">%1</style>"
             "</head>"
-            "<body style=\"background: %5;\">"
-//              "<div style=\"margin: 2px;padding:0px;color: %6;background-color: %5\">"
-                "<div id=\"heading\">%7</div>"
-                    "<table cellspacing=\"0\">"
-                        "<tr>"
-                            "<td>"
-                                "<table>"
-                                    "%8"
-                                "</table>"
-                            "</td>"
-                        "</tr>"
-                    "</table>"
-                    "<pre>%9</pre>"
-//              "</div>"
-            "</body><!-- %6 --!>"
+            "<body>"
+                "<div id=\"heading\">%2</div>"
+                "<table>%3</table>"
+                "<pre>%4</pre>"
+            "</body>"
         "<html>"
                 );
 
     html = html
-            .arg( clrBackSel.name() )  /* %1 */
-            .arg( clrFrntSel.name() )  /* %2 */
-            .arg( clrBackDtl.name() )  /* %3 */
-            .arg( clrFrntDtl.name() )  /* %4 */
-            .arg( clrBackWnd.name() )  /* %5 */
-            .arg( clrFrntWnd.name() )  /* %6 */
-            .arg( head )               /* %7 */
-            .arg( detailRows )         /* %8 */
-            .arg( body.join( QChar( L'\n' ) ) ) /* %9 */
-            .arg( fixed.family() )     /* %10 */
-            .arg( fixed.pointSize() ); /* %11 */
-
-    //qDebug( "%s", qPrintable( html ) );
+            .arg( mStyle )      // %1
+            .arg( head )        // %2
+            .arg( detailRows )  // %3
+            .arg( body.join( QChar( L'\n' ) ) )  // %4
+            ;
 
     setHtml( html );
 }

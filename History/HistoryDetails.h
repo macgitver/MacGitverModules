@@ -52,11 +52,14 @@ public:
 private:
     void updateText();
     void readConfig();
+    void updateStyle();
 
 private:
     Git::ObjectId                   mCurrentSHA1;
     Git::Repository                 mRepo;
     QVector< HistoryHeaderDetails > mViewDetailRows;
+
+    QString                         mStyle;
 };
 
 #endif
