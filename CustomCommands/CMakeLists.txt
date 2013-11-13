@@ -1,0 +1,53 @@
+
+PROJECT( MGV_MOD_CUSTOM_COMMANDS )
+
+QT_PREPARE( Core Gui Widgets Xml )
+
+INCLUDE_DIRECTORIES(
+    ${MGV_MOD_CUSTOM_COMMANDS_SOURCE_DIR}
+    ${MGV_MOD_CUSTOM_COMMANDS_BINARY_DIR}
+)
+
+SET( SRC_FILES
+
+    CustomCommandsModule.cpp
+    CustomCommandListCfgPage.cpp
+    EditCustomCommandDlg.cpp
+    CustomCommandDef.cpp
+)
+
+SET( HDR_FILES
+
+    CustomCommandsModule.hpp
+    CustomCommandListCfgPage.hpp
+    EditCustomCommandDlg.hpp
+    CustomCommandDef.hpp
+)
+
+SET( UI_FILES
+
+    EditCustomCommandDlg.ui
+    CustomCommandListCfgPage.ui
+)
+
+SET( HID_FILES
+    CustomCommandActions.hid
+)
+
+
+HIC( HIC_FILES ${HID_FILES} )
+QT_UIC( UIC_FILES ${UI_FILES} )
+QT_MOC( MOC_FILES ${HDR_FILES} )
+
+ADD_MGV_MODULE(
+    CustomCommands
+
+    ${SRC_FILES}
+    ${HDR_FILES}
+    ${MOC_FILES}
+    ${UIC_FILES} ${UI_FILES}
+    ${HIC_FILES} ${HID_FILES}
+)
+
+MSVC_SPLIT_SOURCES( ModCustomCommands )
+

@@ -1,6 +1,8 @@
 /*
  * MacGitver
- * Copyright (C) 2012 Sascha Cunz <sascha@babbelbox.org>
+ * Copyright (C) 2012-2013 The MacGitver-Developers <dev@macgitver.org>
+ *
+ * (C) Sascha Cunz <sascha@macgitver.org>
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License (Version 2) as published by the Free Software Foundation.
@@ -14,37 +16,28 @@
  *
  */
 
-Ui RepoTreeViewCtxMenu {
+Ui CustomCommandActions {
 
-
-
-    Action Activate {
-        Text            "&Activate";
-        StatusToolTip   "Make this repository the active one.";
-        ConnectTo       onCtxActivate();
+    Container CustComRepoAC {
+        DynamicActionMerger ExecOnBranch
+        {
+            Merger onMergeExecuteOnBranch;
+        };
     };
 
-    Action Close {
-        Text            "&Close";
-        StatusToolTip   "Close this repository";
-        ConnectTo       onCtxClose();
-    };
+    /* This container lands at the bottom part of the 'tools' menu */
+    Container CustComAC {
 
-    Menu CtxMenuRepo {
+        Menu ExecuteOnRepo {
+            Text "R&epository";
+            Container CustComRepoAC;
+        };
 
-        Action      Activate;
         Separator;
-        MergePlace  RepoRootCtx;
-        Separator;
-        Action      Close;
-
-    };
-
-    Menu CtxMenuSMRepo {
-
-        Action      Activate;
-        Separator;
-        MergePlace  RepoSubCtx;
+        DynamicActionMerger ExecGlobally
+        {
+            Merger onMergeExecuteGlobally;
+        };
 
     };
 
