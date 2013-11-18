@@ -1,5 +1,5 @@
 body {
-background: white;
+background: $(MGV_BGCOLOR)$;
 color: black;
 margin: 0px;
 padding: 3px;
@@ -44,6 +44,6 @@ padding: 3px;
 border-left: 1px solid LightGray;
 border-right: 1px solid LightGray;
 border-bottom: 1px dotted gray;
-/*$(MGV_DEFAULT_FONT)$*/
+$(MGV_FONT)$
 }
 

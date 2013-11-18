@@ -60,6 +60,30 @@ void HistoryDetails::updateStyle()
 {
     QFile fStyle( QLatin1String(":/ModHistory/commit-detail.css") );
     mStyle = fStyle.open(QFile::ReadOnly) ? QString::fromUtf8( fStyle.readAll().constData() ) : QString();
+
+    // find macro definitions in css -> $(MY_MACRO)$
+    QRegExp macroExp( QString::fromUtf8("(?:\\$\\(([^\\$]+)\\)\\$)") );
+    macroExp.setPatternSyntax( QRegExp::RegExp2 );
+    QStringList matches;
+    int pos = 0;
+    while ((pos = macroExp.indexIn(mStyle, pos)) != -1) {
+        matches << macroExp.cap(1);
+        pos += macroExp.matchedLength();
+    }
+
+    //TODO: these values should be moved somewhere else
+    QHash<QString, QString> repMap;
+    repMap.insert(QLatin1String("MGV_FONT"), Config::defaultFontCSS());
+    repMap.insert(QLatin1String("MGV_BGCOLOR"),
+                  Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString());
+
+    foreach (QString match, matches)
+    {
+        QString rxStr = QLatin1String( "(?:\\$\\(%1\\)\\$)" );
+        QRegExp rx( rxStr.arg(match) );
+        rx.setPatternSyntax( QRegExp::RegExp2 );
+        mStyle.replace(rx, repMap.value(match));
+    }
 }
 
 void HistoryDetails::setRepository( Git::Repository repo )
