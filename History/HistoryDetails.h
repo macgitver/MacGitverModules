@@ -52,7 +52,7 @@ public:
 private:
     void updateText();
     void readConfig();
-    void updateStyle();
+    QString updateStyle(const QString &templ) const;
 
 private:
     Git::ObjectId                   mCurrentSHA1;

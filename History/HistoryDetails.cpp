@@ -20,6 +20,7 @@
 #include "libGitWrap/Result.hpp"
 
 #include "libMacGitverCore/App/MacGitver.hpp"
+#include "libMacGitverCore/SHMParser/ShMacroParser.hpp"
 
 #include "HistoryDetails.h"
 
@@ -51,39 +52,24 @@ void HistoryDetails::readConfig()
         }
     }
 
-    updateStyle();
+    QFile fStyle( QLatin1String(":/ModHistory/commit-detail.css") );
+    QString styleTempl = fStyle.open(QFile::ReadOnly) ? QString::fromUtf8( fStyle.readAll().constData() ) : QString();
+
+    mStyle = updateStyle( styleTempl );
 
     setCommit( mCurrentSHA1 );
 }
 
-void HistoryDetails::updateStyle()
+QString HistoryDetails::updateStyle(const QString &templ) const
 {
-    QFile fStyle( QLatin1String(":/ModHistory/commit-detail.css") );
-    mStyle = fStyle.open(QFile::ReadOnly) ? QString::fromUtf8( fStyle.readAll().constData() ) : QString();
-
-    // find macro definitions in css -> $(MY_MACRO)$
-    QRegExp macroExp( QString::fromUtf8("(?:\\$\\(([^\\$]+)\\)\\$)") );
-    macroExp.setPatternSyntax( QRegExp::RegExp2 );
-    QStringList matches;
-    int pos = 0;
-    while ((pos = macroExp.indexIn(mStyle, pos)) != -1) {
-        matches << macroExp.cap(1);
-        pos += macroExp.matchedLength();
-    }
-
-    //TODO: these values should be moved somewhere else
-    QHash<QString, QString> repMap;
-    repMap.insert(QLatin1String("MGV_FONT"), Config::defaultFontCSS());
-    repMap.insert(QLatin1String("MGV_BGCOLOR"),
+    // TODO: this hash shall be provided by the "Config" mechanism
+    QHash<QString, QString> macros;
+    macros.insert(QLatin1String("MGV_FONT"), Config::defaultFontCSS());
+    macros.insert(QLatin1String("MGV_BGCOLOR"),
                   Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString());
 
-    foreach (QString match, matches)
-    {
-        QString rxStr = QLatin1String( "(?:\\$\\(%1\\)\\$)" );
-        QRegExp rx( rxStr.arg(match) );
-        rx.setPatternSyntax( QRegExp::RegExp2 );
-        mStyle.replace(rx, repMap.value(match));
-    }
+    // replace constants in css (sample $MY_CONST)
+    return ShMacroParser().expandMacros(templ, macros);
 }
 
 void HistoryDetails::setRepository( Git::Repository repo )
