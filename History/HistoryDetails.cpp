@@ -20,7 +20,7 @@
 #include "libGitWrap/Result.hpp"
 
 #include "libMacGitverCore/App/MacGitver.hpp"
-#include "libMacGitverCore/SHMParser/ShMacroParser.hpp"
+#include "libMacGitverCore/SHMParser/ShellExpand.hpp"
 
 #include "HistoryDetails.h"
 
@@ -63,13 +63,13 @@ void HistoryDetails::readConfig()
 QString HistoryDetails::updateStyle(const QString &templ) const
 {
     // TODO: this hash shall be provided by the "Config" mechanism
-    QHash<QString, QString> macros;
-    macros.insert(QLatin1String("MGV_FONT"), Config::defaultFontCSS());
-    macros.insert(QLatin1String("MGV_BGCOLOR"),
-                  Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString());
+    ShellExpand::Macros macros;
+    macros[QLatin1String("MGV_FONT")] = Config::defaultFontCSS();
+    macros[QLatin1String("MGV_BGCOLOR")] =
+            Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString();
 
     // replace constants in css (sample $MY_CONST)
-    return ShMacroParser().expandMacros(templ, macros);
+    return ShellExpand(macros).apply(templ);
 }
 
 void HistoryDetails::setRepository( Git::Repository repo )
