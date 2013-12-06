@@ -69,7 +69,7 @@ QString HistoryDetails::updateStyle(const QString &templ) const
             Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString();
 
     // replace constants in css (sample $MY_CONST)
-    return ShellExpand(macros).apply(templ);
+    return ShellExpand(macros).expandText(templ);
 }
 
 void HistoryDetails::setRepository( Git::Repository repo )
