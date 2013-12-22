@@ -1,5 +1,5 @@
 body {
-background: $MGV_BGCOLOR;
+background: ${MGV_BGCOLOR:-white};
 color: black;
 margin: 0px;
 padding: 3px;

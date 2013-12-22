@@ -66,7 +66,7 @@ QString HistoryDetails::updateStyle(const QString &templ) const
     ShellExpand::Macros macros;
     macros[QLatin1String("MGV_FONT")] = Config::defaultFontCSS();
     macros[QLatin1String("MGV_BGCOLOR")] =
-            Config::self().get(QLatin1String("mgv-bg"), QLatin1String("white")).toString();
+            Config::self().get(QLatin1String("mgv-bg")).toString();
 
     // replace constants in css (sample $MY_CONST)
     return ShellExpand(macros).expandText(templ);
