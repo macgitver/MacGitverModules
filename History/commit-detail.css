@@ -2,14 +2,14 @@ body {
 background: ${MGV_BGCOLOR:-white};
 color: black;
 margin: 0px;
-padding: 3px;
+padding: 0px;
 }
 
 div.heading {
-border: 1px solid LightGray;
-border-bottom: 1px dotted gray;
+/*border: 1px solid LightGray;
 border-top-left-radius: 3px;
-border-top-right-radius: 3px;
+border-top-right-radius: 3px;*/
+border-bottom: 1px dotted gray;
 font-size: x-large;
 padding: 3px;
 margin: 0;
@@ -26,6 +26,7 @@ border-bottom: 1px dotted gray;
 border-collapse: collapse;
 border-spacing: 0;
 text-align: left;
+padding: 3px;
 white-space: nowrap;
 }
 
