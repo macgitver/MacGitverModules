@@ -125,9 +125,9 @@ void HistoryDetails::updateText()
 
     QString detailRows;
 
-    for( int i = 0; i < mViewDetailRows.count(); i++ )
+    foreach (HistoryHeaderDetails detailType, mViewDetailRows)
     {
-        switch( mViewDetailRows[ i ] )
+        switch( detailType )
         {
         case HHD_Subject:
             detailRows += mkRow( trUtf8( "Subject" ),
