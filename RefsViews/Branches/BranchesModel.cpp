@@ -242,11 +242,8 @@ void BranchesModel::onRefCreated(RM::Repo* repo, RM::Ref* ref)
     if ( repo != mData->repository() ) {
         return;
     }
-    Git::Result r;
-    Git::Reference gref = repo->gitRepo().reference( r, ref->fullName() );
-    Q_ASSERT( r );
 
-    insertRef( true, gref );
+    insertRef( true, ref );
 }
 
 void BranchesModel::onRefDestroyed(RM::Repo* repo, RM::Ref* ref)
