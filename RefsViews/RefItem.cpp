@@ -26,6 +26,9 @@
 #include <QFont>
 #include <QFileIconProvider>
 
+
+// -- RefItem --8>
+
 RefItem::RefItem()
     : parent( NULL )
 {
@@ -64,7 +67,6 @@ QVariant RefItem::data(int col, int role) const
     return QVariant();
 }
 
-
 QString RefItem::text() const
 {
     return QString();
@@ -100,6 +102,8 @@ QString RefScope::text() const
 }
 
 
+// -- RefNameSpace --8>
+
 RefNameSpace::RefNameSpace(RefItem *p, const QString &t)
     : RefScope( p, t )
 {
@@ -121,6 +125,9 @@ QVariant RefNameSpace::data(int col, int role) const
 
     return QVariant();
 }
+
+
+// -- RefBranch --8>
 
 RefBranch::RefBranch(RefItem* p, const RM::Ref* refInfo)
     : RefItem( p )
