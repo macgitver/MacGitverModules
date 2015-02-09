@@ -18,14 +18,12 @@
 
 #include "RefItem.hpp"
 
-#include "libGitWrap/Reference.hpp"
-#include "libGitWrap/Repository.hpp"
 #include "libGitWrap/Result.hpp"
 
 #include "libMacGitverCore/RepoMan/Ref.hpp"
+#include "libMacGitverCore/RepoMan/RepoMan.hpp"
 
 #include <QFont>
-#include <QLinearGradient>
 #include <QFileIconProvider>
 
 RefItem::RefItem()
@@ -124,11 +122,26 @@ QVariant RefNameSpace::data(int col, int role) const
     return QVariant();
 }
 
-
-RefBranch::RefBranch(RefItem *p, const Git::Reference &ref)
+RefBranch::RefBranch(RefItem* p, const RM::Ref* refInfo)
     : RefItem( p )
-    , mRef( ref )
+    , mRefInfo( refInfo )
 {
+    Q_ASSERT( refInfo );
+}
+
+Git::Reference RefBranch::lookupGitReference(const RefBranch* item)
+{
+    if ( !item ) {
+        return Git::Reference();
+    }
+
+    const RM::Ref* ref = item->referenceInfo();
+    if ( !ref ) {
+        return Git::Reference();
+    }
+
+    Git::Result r;
+    return ref->repository()->gitLoadedRepo().reference( r, ref->fullName() );
 }
 
 /**
@@ -138,7 +151,9 @@ RefBranch::RefBranch(RefItem *p, const Git::Reference &ref)
  */
 bool RefBranch::isValid() const
 {
-    return (mRef.isValid() && !mRef.wasDestroyed());
+    Git::Result r;
+    Git::Reference gref = lookupGitReference( this );
+    return (gref.isValid() && !gref.wasDestroyed());
 }
 
 /**
@@ -152,17 +167,19 @@ bool RefBranch::isValid() const
  */
 bool RefBranch::sameReference(const RM::Ref* ref) const
 {
-    return ref && mRef.name() == ref->fullName();
+    return ref == mRefInfo || mRefInfo->fullName() == ref->fullName();
 }
 
 QVariant RefBranch::data(int col, int role) const
 {
     if ( role == Qt::DisplayRole )
-        return mRef.shorthand().section( QChar(L'/'), -1 );
+        return mRefInfo->displayName();
 
     else if ( role == Qt::FontRole )
     {
-        if( mRef.isCurrentBranch() )
+        Git::Result r;
+        const Git::Reference headRef = lookupHEAD( r, mRefInfo );
+        if( headRef.target() == mRefInfo->fullName() )
         {
             QFont f;
             f.setBold( true );
@@ -173,13 +190,11 @@ QVariant RefBranch::data(int col, int role) const
     else if ( role == RefItem::RowBgGradientRole )
     {
         Git::Result r;
-
-        if ( mRef.compare( mRef.repository().HEAD(r) ) == 0 )
+        const Git::Reference headRef = lookupHEAD( r, mRefInfo );
+        if ( headRef.resolveToObjectId( r ) == mRefInfo->id() )
         {
-            QColor back = mRef.isCurrentBranch()
-                          ? QColor::fromHsl(35, 255, 190)
-                          : QColor::fromHsl(35, 255, 190).lighter(130);
-            return back;
+            const QColor c = QColor::fromHsl(35, 255, 190);
+            return ( headRef.target() == mRefInfo->fullName() ) ? c : c.lighter(130);
         }
     }
 
@@ -187,10 +202,18 @@ QVariant RefBranch::data(int col, int role) const
         return RefItem::Reference;
 
     else if ( role == Qt::EditRole)
-        return mRef.name();
+        return mRefInfo->name();
 
     return QVariant();
 }
 
+const RM::Ref*RefBranch::referenceInfo() const
+{
+    return mRefInfo;
+}
 
-
+Git::Reference RefBranch::lookupHEAD(Git::Result& result, const RM::Ref* ref)
+{
+    const RM::Repo* repo = ref->repository();
+    return repo->gitLoadedRepo().reference( result, QStringLiteral("HEAD") );
+}

@@ -21,15 +21,13 @@
 
 #include <QAbstractItemModel>
 
-#include "libGitWrap/Reference.hpp"
-#include "libGitWrap/Repository.hpp"
+#include "libMacGitverCore/RepoMan/Ref.hpp"
 
 #include "Branches/BranchesViewData.hpp"
 #include "RefItem.hpp"
 
 namespace RM
 {
-    class Ref;
     class Repo;
 }
 
@@ -66,46 +64,11 @@ private slots:
 private:
     QModelIndex index(RefItem* item) const;
 
-    void insertRef(bool notify, const Git::Reference& ref);
-    inline RefItem* insertNamespace(const bool notify, RefItem* parent, const QString& name)
-    {
-        RefItem* next = NULL;
-        if ( notify ) {
-            int fr = parent->children.count();
-            beginInsertRows( index( parent ), fr, fr );
-        }
+    void insertRef(bool notify, const RM::Ref* ref);
 
-        next = new RefNameSpace( parent, name );
-
-        if ( notify ) {
-            endInsertRows();
-        }
-        return next;
-    }
-
-    inline void insertBranch(const bool notify, RefItem *parent, const Git::Reference& ref)
-    {
-        if ( notify ) {
-            int row = parent->children.count();
-            beginInsertRows( index( parent ), row, row );
-        }
-
-        new RefBranch( parent, ref );
-
-        if (notify) {
-            endInsertRows();
-        }
-    }
-
-    inline RefScope* scopeForRef( const Git::Reference& ref ) const
-    {
-        RefItem* scope = NULL;
-        if ( ref.isLocal() )        scope = mHeaderLocal;
-        else if ( ref.isRemote() )  scope = mHeaderRemote;
-        else scope = mHeaderTags;
-
-        return static_cast< RefScope* >( scope );
-    }
+    inline RefItem* insertNamespace(const bool notify, RefItem* parent, const QString& name);
+    inline void insertBranch(const bool notify, RefItem *parent, const RM::Ref* ref);
+    inline RefScope* scopeForRef( const RM::Ref* ref ) const;
 
 private:
     BranchesViewData*   mData;
@@ -118,5 +81,51 @@ private:
 private:
     static void findInvalidRefItems(QVector<RefItem*>& invalidItems, RefItem* item, const RM::Ref* ref);
 };
+
+
+// -- INLINED PRIVATE METHODS BEGIN --8>
+
+RefItem* BranchesModel::insertNamespace(const bool notify, RefItem* parent, const QString& name)
+{
+    RefItem* next = NULL;
+    if ( notify ) {
+        int fr = parent->children.count();
+        beginInsertRows( index( parent ), fr, fr );
+    }
+
+    next = new RefNameSpace( parent, name );
+
+    if ( notify ) {
+        endInsertRows();
+    }
+    return next;
+}
+
+void BranchesModel::insertBranch(const bool notify, RefItem* parent, const RM::Ref* ref)
+{
+    if ( notify ) {
+        int row = parent->children.count();
+        beginInsertRows( index( parent ), row, row );
+    }
+
+    new RefBranch( parent, ref );
+
+    if (notify) {
+        endInsertRows();
+    }
+}
+
+RefScope*BranchesModel::scopeForRef(const RM::Ref* ref) const
+{
+    RefItem* scope = NULL;
+    if ( ref->type() == RM::BranchType )        scope = mHeaderLocal;
+    // TODO: how to find the "remote branches"?
+    //    else if ( ref->isA<RM::RemoteObject>() )    scope = mHeaderRemote;
+    else scope = mHeaderTags;
+
+    return static_cast< RefScope* >( scope );
+}
+
+// <8-- INLINED PRIVATE METHODS END --
 
 #endif

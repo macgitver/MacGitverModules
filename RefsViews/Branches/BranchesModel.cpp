@@ -16,15 +16,13 @@
  *
  */
 
-#include <QFont>
+#include "BranchesModel.hpp"
 
 #include "libMacGitverCore/App/MacGitver.hpp"
+#include "libMacGitverCore/RepoMan/Branch.hpp"
+#include "libMacGitverCore/RepoMan/CollectionNode.hpp"
 #include "libMacGitverCore/RepoMan/RepoMan.hpp"
-#include "libMacGitverCore/RepoMan/Ref.hpp"
-
-#include "libGitWrap/Result.hpp"
-
-#include "BranchesModel.hpp"
+#include "libMacGitverCore/RepoMan/Tag.hpp"
 
 
 BranchesModel::BranchesModel( BranchesViewData* parent )
@@ -148,12 +146,12 @@ bool BranchesModel::hasChildren( const QModelIndex& parent ) const
     return parentItem->children.count() > 0;
 }
 
-void BranchesModel::insertRef(bool notify, const Git::Reference &ref)
+void BranchesModel::insertRef(bool notify, const RM::Ref *ref)
 {
     RefScope* scope = scopeForRef( ref );
     Q_ASSERT( scope );
 
-    QStringList parts = ref.shorthand().split( QChar( L'/' ) );
+    QStringList parts = ref->fullName().split( QChar( L'/' ) );
     if ( parts.count() == 1 )
     {
         insertBranch( notify, scope, ref );
@@ -186,7 +184,6 @@ void BranchesModel::insertRef(bool notify, const Git::Reference &ref)
     insertBranch( notify, ns, ref );
 }
 
-
 void BranchesModel::rereadBranches()
 {
     beginResetModel();
@@ -199,21 +196,14 @@ void BranchesModel::rereadBranches()
     mHeaderTags     = new RefScope( mRoot, tr( "Tags" ) );
 
     RM::Repo* repo = mData->repository();
-
-    // TODO: migrate to RM::Repo
-    Git::Repository gitRepo = repo ? repo->gitRepo() : Git::Repository();
-
-    if( gitRepo.isValid() )
+    if( repo )
     {
-        Git::Result r;
-        Git::ReferenceList sl = gitRepo.allReferences( r );
-        if( !sl.isEmpty() )
-        {
-            for( int i = 0; i < sl.count(); ++i )
-            {
-                const Git::Reference &currentRef = sl[ i ];
-                insertRef( false, currentRef );
-            }
+        foreach ( RM::Branch* info, repo->branches()->childObjects<RM::Branch>() ) {
+            insertRef( false, info );
+        }
+
+        foreach ( RM::Tag* info, repo->tags()->childObjects<RM::Tag>() ) {
+            insertRef( false, info );
         }
     }
 

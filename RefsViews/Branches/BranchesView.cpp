@@ -99,9 +99,9 @@ void BranchesView::onCheckoutRef()
         return;
 
     const RefBranch *branch = static_cast<const RefBranch *>( srcIndex.internalPointer() );
-    if ( !branch ) return;
+    const Git::Reference ref = RefBranch::lookupGitReference( branch );
 
-    Git::CheckoutReferenceOperation* op = new Git::CheckoutReferenceOperation( branch->reference() );
+    Git::CheckoutReferenceOperation* op = new Git::CheckoutReferenceOperation( ref );
     op->setMode( Git::CheckoutSafe );
     op->setStrategy( Git::CheckoutUpdateHEAD | Git::CheckoutAllowConflicts );
     // TODO: setBackgroundMode( true );
@@ -112,7 +112,7 @@ void BranchesView::onCheckoutRef()
     {
         QMessageBox::warning( this, trUtf8("Error while checking out reference."),
                               trUtf8("Failed to checkout reference (%1).\nGit message: %2")
-                              .arg(branch->reference().shorthand())
+                              .arg( ref.shorthand() )
                               .arg(r.errorText()) );
     }
 }
@@ -126,24 +126,25 @@ void BranchesView::onRemoveRef()
     if ( !srcIndex.isValid() ) return;
 
     const RefBranch *branch = static_cast<const RefBranch *>( srcIndex.internalPointer() );
-    if ( !branch ) return;
+    Git::Reference ref = RefBranch::lookupGitReference( branch );
 
-    if ( !askToGoOn( trUtf8("Delete reference \'%1\'?").arg(branch->reference().shorthand()) ) )
+    if ( !askToGoOn( tr("Delete reference \'%1\'?").arg( ref.shorthand() ) ) ) {
         return;
+    }
+
+    if ( !checkRemoveRef( ref ) ) {
+        return;
+    }
 
     Git::Result r;
-    Git::Reference ref = branch->reference();
-
-    if ( !checkRemoveRef( ref ) ) return;
-
-    ref.destroy(r);
+    ref.destroy( r );
 
     if ( !r )
     {
-        QMessageBox::warning( this, trUtf8("Error while removing reference."),
-                              trUtf8("Failed to remove reference (%1).\nGit message: %2")
-                              .arg(branch->reference().shorthand())
-                              .arg(r.errorText()) );
+        QMessageBox::warning( this, tr("Error while removing reference."),
+                              tr("Failed to remove reference (%1).\nGit message: %2")
+                              .arg( ref.shorthand() )
+                              .arg( r.errorText() ) );
     }
 }
 
