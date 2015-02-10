@@ -70,9 +70,9 @@ private:
     void insertRefs(bool notify, const RM::CollectionNode* cn);
     void insertRefs(bool notify, const RM::RefTreeNode* ns);
 
-    inline RefItem* insertNamespace(bool notify, RefItem* parent, const QString& name);
-    inline void insertBranch(bool notify, RefItem *parent, const RM::Ref* ref);
-    inline RefScope* scopeForRef(Git::RefName refName) const;
+    RefItem* insertNamespace(bool notify, RefItem* parent, const QString& name);
+    void insertBranch(bool notify, RefItem *parent, const RM::Ref* ref);
+    RefScope* scopeForRef(Git::RefName refName) const;
 
 private:
     BranchesViewData*   mData;
@@ -89,7 +89,7 @@ private:
 
 // -- INLINED PRIVATE METHODS BEGIN --8>
 
-RefItem* BranchesModel::insertNamespace(bool notify, RefItem* parent, const QString& name)
+inline RefItem* BranchesModel::insertNamespace(bool notify, RefItem* parent, const QString& name)
 {
     RefItem* next = NULL;
     if ( notify ) {
@@ -105,7 +105,7 @@ RefItem* BranchesModel::insertNamespace(bool notify, RefItem* parent, const QStr
     return next;
 }
 
-void BranchesModel::insertBranch(bool notify, RefItem* parent, const RM::Ref* ref)
+inline void BranchesModel::insertBranch(bool notify, RefItem* parent, const RM::Ref* ref)
 {
     if ( notify ) {
         int row = parent->children.count();
@@ -119,7 +119,7 @@ void BranchesModel::insertBranch(bool notify, RefItem* parent, const RM::Ref* re
     }
 }
 
-RefScope* BranchesModel::scopeForRef(Git::RefName refName) const
+inline RefScope* BranchesModel::scopeForRef(Git::RefName refName) const
 {
     if ( refName.isBranch() ) {
         return refName.isRemote() ? mHeaderRemote : mHeaderLocal;
