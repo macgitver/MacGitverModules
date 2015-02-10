@@ -21,6 +21,7 @@
 #include "libMacGitverCore/App/MacGitver.hpp"
 #include "libMacGitverCore/RepoMan/Branch.hpp"
 #include "libMacGitverCore/RepoMan/CollectionNode.hpp"
+#include "libMacGitverCore/RepoMan/RefTreeNode.hpp"
 #include "libMacGitverCore/RepoMan/RepoMan.hpp"
 #include "libMacGitverCore/RepoMan/Tag.hpp"
 
@@ -148,24 +149,23 @@ bool BranchesModel::hasChildren( const QModelIndex& parent ) const
 
 void BranchesModel::insertRef(bool notify, const RM::Ref *ref)
 {
-    RefScope* scope = scopeForRef( ref );
-    Q_ASSERT( scope );
-
-    QStringList parts = ref->fullName().split( QChar( L'/' ) );
-    if ( parts.count() == 1 )
-    {
-        insertBranch( notify, scope, ref );
-        return;
+    Git::RefName analyzer( ref->fullName() );
+    RefScope* scope = scopeForRef( analyzer );
+    QStringList namespaces = analyzer.isNamespaced()
+                             ? analyzer.namespaces()
+                             : analyzer.shorthand().split( QChar( L'/' ) );
+    if ( !analyzer.isNamespaced() ) {
+        // remove the branch name
+        namespaces.removeLast();
     }
 
     RefItem* ns = scope;
-    for( int j = 0; j < parts.count() - 1; j++ )
+    foreach( QString nsName, namespaces )
     {
         RefItem* next = NULL;
-        QString partName = parts[ j ];
         foreach( RefItem* nsChild, ns->children )
         {
-            if( nsChild->text() == partName )
+            if( nsChild->text() == nsName )
             {
                 next = nsChild;
                 break;
@@ -174,14 +174,35 @@ void BranchesModel::insertRef(bool notify, const RM::Ref *ref)
 
         if( !next )
         {
-            next = insertNamespace( notify, ns, partName );
+            next = insertNamespace( notify, ns, nsName );
         }
         ns = next;
     }
 
-    Q_ASSERT( ns );
-
     insertBranch( notify, ns, ref );
+}
+
+void BranchesModel::insertRefs(bool notify, const RM::CollectionNode* cn)
+{
+    foreach ( RM::Ref* ref, cn->childObjects<RM::Ref>() ) {
+        insertRef( notify, ref );
+    }
+
+    foreach ( RM::RefTreeNode* rtn, cn->childObjects<RM::RefTreeNode>() ) {
+        insertRefs( notify, rtn );
+    }
+}
+
+void BranchesModel::insertRefs(bool notify, const RM::RefTreeNode* ns)
+{
+    foreach (RM::Ref* b, ns->childObjects<RM::Ref>() ) {
+        insertRef( notify, b );
+    }
+
+    // recurse into sub-nodes
+    foreach ( RM::RefTreeNode* sub, ns->childObjects<RM::RefTreeNode>() ) {
+        insertRefs( notify, sub );
+    }
 }
 
 void BranchesModel::rereadBranches()
@@ -198,13 +219,8 @@ void BranchesModel::rereadBranches()
     RM::Repo* repo = mData->repository();
     if( repo )
     {
-        foreach ( RM::Branch* info, repo->branches()->childObjects<RM::Branch>() ) {
-            insertRef( false, info );
-        }
-
-        foreach ( RM::Tag* info, repo->tags()->childObjects<RM::Tag>() ) {
-            insertRef( false, info );
-        }
+        insertRefs( false, repo->branches() );
+        insertRefs( false, repo->tags() );
     }
 
     endResetModel();

@@ -21,6 +21,8 @@
 
 #include <QAbstractItemModel>
 
+#include "libGitWrap/RefName.hpp"
+
 #include "libMacGitverCore/RepoMan/Ref.hpp"
 
 #include "Branches/BranchesViewData.hpp"
@@ -65,10 +67,12 @@ private:
     QModelIndex index(RefItem* item) const;
 
     void insertRef(bool notify, const RM::Ref* ref);
+    void insertRefs(bool notify, const RM::CollectionNode* cn);
+    void insertRefs(bool notify, const RM::RefTreeNode* ns);
 
     inline RefItem* insertNamespace(const bool notify, RefItem* parent, const QString& name);
     inline void insertBranch(const bool notify, RefItem *parent, const RM::Ref* ref);
-    inline RefScope* scopeForRef( const RM::Ref* ref ) const;
+    inline RefScope* scopeForRef(Git::RefName refName) const;
 
 private:
     BranchesViewData*   mData;
@@ -115,15 +119,14 @@ void BranchesModel::insertBranch(const bool notify, RefItem* parent, const RM::R
     }
 }
 
-RefScope*BranchesModel::scopeForRef(const RM::Ref* ref) const
+RefScope* BranchesModel::scopeForRef(Git::RefName refName) const
 {
-    RefItem* scope = NULL;
-    if ( ref->type() == RM::BranchType )        scope = mHeaderLocal;
-    // TODO: how to find the "remote branches"?
-    //    else if ( ref->isA<RM::RemoteObject>() )    scope = mHeaderRemote;
-    else scope = mHeaderTags;
+    if ( refName.isBranch() ) {
+        return refName.isRemote() ? mHeaderRemote : mHeaderLocal;
+    }
 
-    return static_cast< RefScope* >( scope );
+    // TODO: analyze scopes for all reference types
+    return mHeaderTags;
 }
 
 // <8-- INLINED PRIVATE METHODS END --
