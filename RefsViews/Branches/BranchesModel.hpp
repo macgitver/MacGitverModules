@@ -70,8 +70,8 @@ private:
     void insertRefs(bool notify, const RM::CollectionNode* cn);
     void insertRefs(bool notify, const RM::RefTreeNode* ns);
 
-    inline RefItem* insertNamespace(const bool notify, RefItem* parent, const QString& name);
-    inline void insertBranch(const bool notify, RefItem *parent, const RM::Ref* ref);
+    inline RefItem* insertNamespace(bool notify, RefItem* parent, const QString& name);
+    inline void insertBranch(bool notify, RefItem *parent, const RM::Ref* ref);
     inline RefScope* scopeForRef(Git::RefName refName) const;
 
 private:
@@ -89,7 +89,7 @@ private:
 
 // -- INLINED PRIVATE METHODS BEGIN --8>
 
-RefItem* BranchesModel::insertNamespace(const bool notify, RefItem* parent, const QString& name)
+RefItem* BranchesModel::insertNamespace(bool notify, RefItem* parent, const QString& name)
 {
     RefItem* next = NULL;
     if ( notify ) {
@@ -105,7 +105,7 @@ RefItem* BranchesModel::insertNamespace(const bool notify, RefItem* parent, cons
     return next;
 }
 
-void BranchesModel::insertBranch(const bool notify, RefItem* parent, const RM::Ref* ref)
+void BranchesModel::insertBranch(bool notify, RefItem* parent, const RM::Ref* ref)
 {
     if ( notify ) {
         int row = parent->children.count();
