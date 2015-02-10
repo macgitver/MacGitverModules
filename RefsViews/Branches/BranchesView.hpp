@@ -54,8 +54,6 @@ public slots:
     void onRemoveRef();
     void onRenameRef();
 
-    void onJumpToCurrentBranch();
-
     void actionFailed(const Git::Result &error);
 
 protected:
