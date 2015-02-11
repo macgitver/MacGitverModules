@@ -16,15 +16,14 @@
  *
  */
 
-#include <QFont>
+#include "BranchesModel.hpp"
 
 #include "libMacGitverCore/App/MacGitver.hpp"
+#include "libMacGitverCore/RepoMan/Branch.hpp"
+#include "libMacGitverCore/RepoMan/CollectionNode.hpp"
+#include "libMacGitverCore/RepoMan/RefTreeNode.hpp"
 #include "libMacGitverCore/RepoMan/RepoMan.hpp"
-#include "libMacGitverCore/RepoMan/Ref.hpp"
-
-#include "libGitWrap/Result.hpp"
-
-#include "BranchesModel.hpp"
+#include "libMacGitverCore/RepoMan/Tag.hpp"
 
 
 BranchesModel::BranchesModel( BranchesViewData* parent )
@@ -148,26 +147,25 @@ bool BranchesModel::hasChildren( const QModelIndex& parent ) const
     return parentItem->children.count() > 0;
 }
 
-void BranchesModel::insertRef(bool notify, const Git::Reference &ref)
+void BranchesModel::insertRef(bool notify, const RM::Ref *ref)
 {
-    RefScope* scope = scopeForRef( ref );
-    Q_ASSERT( scope );
-
-    QStringList parts = ref.shorthand().split( QChar( L'/' ) );
-    if ( parts.count() == 1 )
-    {
-        insertBranch( notify, scope, ref );
-        return;
+    Git::RefName analyzer( ref->fullName() );
+    RefScope* scope = scopeForRef( analyzer );
+    QStringList namespaces = analyzer.isNamespaced()
+                             ? analyzer.namespaces()
+                             : analyzer.shorthand().split( QChar( L'/' ) );
+    if ( !analyzer.isNamespaced() ) {
+        // remove the branch name
+        namespaces.removeLast();
     }
 
     RefItem* ns = scope;
-    for( int j = 0; j < parts.count() - 1; j++ )
+    foreach( QString nsName, namespaces )
     {
         RefItem* next = NULL;
-        QString partName = parts[ j ];
         foreach( RefItem* nsChild, ns->children )
         {
-            if( nsChild->text() == partName )
+            if( nsChild->text() == nsName )
             {
                 next = nsChild;
                 break;
@@ -176,16 +174,36 @@ void BranchesModel::insertRef(bool notify, const Git::Reference &ref)
 
         if( !next )
         {
-            next = insertNamespace( notify, ns, partName );
+            next = insertNamespace( notify, ns, nsName );
         }
         ns = next;
     }
 
-    Q_ASSERT( ns );
-
     insertBranch( notify, ns, ref );
 }
 
+void BranchesModel::insertRefs(bool notify, const RM::CollectionNode* cn)
+{
+    foreach ( RM::Ref* ref, cn->childObjects<RM::Ref>() ) {
+        insertRef( notify, ref );
+    }
+
+    foreach ( RM::RefTreeNode* rtn, cn->childObjects<RM::RefTreeNode>() ) {
+        insertRefs( notify, rtn );
+    }
+}
+
+void BranchesModel::insertRefs(bool notify, const RM::RefTreeNode* ns)
+{
+    foreach (RM::Ref* b, ns->childObjects<RM::Ref>() ) {
+        insertRef( notify, b );
+    }
+
+    // recurse into sub-nodes
+    foreach ( RM::RefTreeNode* sub, ns->childObjects<RM::RefTreeNode>() ) {
+        insertRefs( notify, sub );
+    }
+}
 
 void BranchesModel::rereadBranches()
 {
@@ -199,22 +217,10 @@ void BranchesModel::rereadBranches()
     mHeaderTags     = new RefScope( mRoot, tr( "Tags" ) );
 
     RM::Repo* repo = mData->repository();
-
-    // TODO: migrate to RM::Repo
-    Git::Repository gitRepo = repo ? repo->gitRepo() : Git::Repository();
-
-    if( gitRepo.isValid() )
+    if( repo )
     {
-        Git::Result r;
-        Git::ReferenceList sl = gitRepo.allReferences( r );
-        if( !sl.isEmpty() )
-        {
-            for( int i = 0; i < sl.count(); ++i )
-            {
-                const Git::Reference &currentRef = sl[ i ];
-                insertRef( false, currentRef );
-            }
-        }
+        insertRefs( false, repo->branches() );
+        insertRefs( false, repo->tags() );
     }
 
     endResetModel();
@@ -252,11 +258,8 @@ void BranchesModel::onRefCreated(RM::Repo* repo, RM::Ref* ref)
     if ( repo != mData->repository() ) {
         return;
     }
-    Git::Result r;
-    Git::Reference gref = repo->gitRepo().reference( r, ref->fullName() );
-    Q_ASSERT( r );
 
-    insertRef( true, gref );
+    insertRef( true, ref );
 }
 
 void BranchesModel::onRefDestroyed(RM::Repo* repo, RM::Ref* ref)

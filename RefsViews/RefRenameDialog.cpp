@@ -22,6 +22,9 @@
 
 #include "libGitWrap/Reference.hpp"
 
+#include "libMacGitverCore/RepoMan/Ref.hpp"
+
+
 RefRenameDialog::RefRenameDialog()
     : BlueSky::Dialog()
     , mRefInfo( 0 )
@@ -53,7 +56,7 @@ void RefRenameDialog::accept()
         return;
     }
 
-    Git::Reference ref = mRefInfo->reference();
+    Git::Reference ref = RefBranch::lookupGitReference( mRefInfo );
     const QString oldRefName = ref.name();
     const QString prefix = oldRefName.left( oldRefName.length() - ref.shorthand().length() );
 
@@ -73,7 +76,7 @@ void RefRenameDialog::updateValues()
 {
     if ( !mRefInfo ) return;
 
-    const Git::Reference& ref = mRefInfo->reference();
-    Q_ASSERT( ref.isValid() );
-    textRefName->setText( ref.shorthand() );
+    const RM::Ref* ref = mRefInfo->referenceInfo();
+    Q_ASSERT( ref );
+    textRefName->setText( ref->name() );
 }

@@ -91,7 +91,10 @@ public:
 class RefBranch : public RefItem
 {
 public:
-    explicit RefBranch(RefItem* p, const Git::Reference &ref);
+    RefBranch(RefItem* p, const RM::Ref* refInfo);
+
+public:
+    static Git::Reference lookupGitReference( const RefBranch* item );
 
 public:
     bool isValid() const;
@@ -99,13 +102,13 @@ public:
 
     QVariant data( int col, int role ) const;
 
-    Git::Reference reference() const
-    {
-        return mRef;
-    }
+    const RM::Ref* referenceInfo() const;
 
 private:
-    Git::Reference  mRef;
+    const RM::Ref*  mRefInfo;
+
+private:
+    static Git::Reference lookupHEAD(Git::Result& result, const RM::Ref* ref);
 };
 
 #endif // REF_ITEM_HPP
