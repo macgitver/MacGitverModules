@@ -27,6 +27,7 @@
 #include "libMacGitverCore/RepoMan/Branch.hpp"
 #include "libMacGitverCore/RepoMan/Tag.hpp"
 #include "libMacGitverCore/RepoMan/Remote.hpp"
+#include "libMacGitverCore/RepoMan/Repo.hpp"
 
 #include <QList>
 #include <QVariant>
@@ -148,6 +149,16 @@ public:
     }
 
 protected:
+    bool matchesHEAD(RM::Ref* HEAD) const
+    {
+        if ( HEAD ) {
+            return mObject->id() == HEAD->resolvedId();
+        }
+
+        return false;
+    }
+
+protected:
     T* mObject;
 };
 
@@ -205,6 +216,8 @@ public:
 public:
     QVariant data(int role) const;
     ItemType type() const;
+
+    bool isCurrentBranch(const RM::Ref* HEAD) const;
 };
 
 

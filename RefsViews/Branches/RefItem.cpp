@@ -133,6 +133,15 @@ RefItem::ItemType RefBranch::type() const
     return Branch;
 }
 
+bool RefBranch::isCurrentBranch(const RM::Ref* HEAD) const
+{
+    if ( HEAD ) {
+        return mObject->fullName() == HEAD->symbolicTarget();
+    }
+
+    return false;
+}
+
 QVariant RefBranch::data(int role) const
 {
     Git::Result r;
@@ -140,28 +149,27 @@ QVariant RefBranch::data(int role) const
 
     switch (role) {
     case Qt::FontRole:
-        #if 0
-        if( mRef.isCurrentBranch() )
+        if( isCurrentBranch( mObject->repository()->HEAD() ) )
         {
             QFont f;
             f.setBold( true );
             return f;
         }
-        #endif
         break;
 
     case RefItem::RowBgGradientRole:
-        #if 0
-        if ( mRef.compare( mRef.repository().HEAD(r) ) == 0 )
-        {
-            QColor back = mRef.isCurrentBranch()
-                          ? QColor::fromHsl(35, 255, 190)
-                          : QColor::fromHsl(35, 255, 190).lighter(130);
-            return back;
+    {
+        RM::Ref* HEAD = mObject->repository()->HEAD();
+        if ( isCurrentBranch( HEAD ) ) {
+            return QColor::fromHsl(35, 255, 190);
         }
-        #endif
+
+        if ( matchesHEAD( HEAD ) ) {
+            return QColor::fromHsl(35, 255, 190).lighter(130);
+        }
+
         break;
-    }
+    } }
 
     return RefItemObject::data(role);
 }
