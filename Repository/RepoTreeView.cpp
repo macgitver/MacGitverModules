@@ -15,7 +15,10 @@
  */
 
 #include <QDebug>
+#include <QMessageBox>
 #include <QSortFilterProxyModel>
+
+#include "libGitWrap/Operations/RemoteOperations.hpp"
 
 #include "libMacGitverCore/Widgets/TreeViewCtxMenu.hpp"
 
@@ -143,9 +146,63 @@ void RepoTreeView::onRepoDeactivated(RM::Repo* repo)
     }
 }
 
+/**
+ * @brief Called as soon as one fetch operation finishes.
+ */
+void RepoTreeView::fetchOperationFinished()
+{
+    Git::FetchOperation* op = qobject_cast<Git::FetchOperation*>( sender() );
+    Q_ASSERT( op );
+
+    Git::Result r( op->result() );
+    if ( !r ) {
+        QMessageBox::warning( this, tr("Operation failed."),
+                              tr("Failed to fetch repository '%1'.\nMessage: %2")
+                              .arg(op->repository().name()).arg(r.errorText())
+                              );
+    }
+
+    // delete the operation
+    op->deleteLater();
+}
 
 void RepoTreeView::onCtxFetchAll()
 {
+    Heaven::Action* action = qobject_cast< Heaven::Action* >( sender() );
+    Q_ASSERT( action );
+
+    RM::Repo* repo = qobject_cast< RM::Repo* >( action->activatedBy() );
+    if( repo ) {
+        Git::Result r;
+        Git::Repository gitRepo = repo->gitRepo();
+        const QStringList aliases( gitRepo.allRemoteNames(r) );
+        if ( !r ) {
+            QMessageBox::warning( this, tr("Lookup of remotes failed"),
+                                  tr("Unable to lookup remotes for repository '%1'."
+                                     "\nMessage: %2").arg(repo->displayName())
+                                  .arg(r.errorText())
+                                  );
+            return;
+        }
+
+        if ( aliases.isEmpty() ) {
+            QMessageBox::information( this, tr("No Remotes found"),
+                                      tr("No remotes configured for repository '%1'.")
+                                      .arg(repo->displayName())
+                                      );
+            return;
+        }
+
+        foreach (const QString& alias, aliases) {
+            Git::FetchOperation* op = new Git::FetchOperation( repo->gitRepo() );
+            // TODO: needs extension in GW-API
+            //op->setRemoteAlias( alias );
+            op->setBackgroundMode( true );
+            connect( op, SIGNAL(finished()), this, SLOT(fetchOperationFinished()) );
+            // TODO: create a central dialog to show progress of parallel operations
+            op->execute();
+        }
+    }
 }
 
 BlueSky::ViewContext* RepoTreeView::createContextObject() const

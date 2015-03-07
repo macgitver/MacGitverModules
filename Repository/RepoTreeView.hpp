@@ -55,6 +55,9 @@ private slots:  // for MacGitver::repoMan()
     void onRepoActivated(RM::Repo* repo);
     void onRepoDeactivated(RM::Repo* repo);
 
+private slots:
+    void fetchOperationFinished();
+
 private:
     QModelIndex deeplyMapToSource( QModelIndex current ) const;
     BlueSky::ViewContext* createContextObject() const;
