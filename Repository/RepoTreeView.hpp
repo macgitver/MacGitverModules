@@ -46,6 +46,8 @@ private slots:  // from actions
     void onCtxActivate();
     void onCtxClose();
 
+    void onCtxFetchAll();
+
 private slots:  // from mRepos
     void contextMenu( const QModelIndex& index, const QPoint& globalPos );
 

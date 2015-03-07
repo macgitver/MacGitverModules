@@ -143,6 +143,11 @@ void RepoTreeView::onRepoDeactivated(RM::Repo* repo)
     }
 }
 
+
+void RepoTreeView::onCtxFetchAll()
+{
+}
+
 BlueSky::ViewContext* RepoTreeView::createContextObject() const
 {
     return new RepositoryContext;

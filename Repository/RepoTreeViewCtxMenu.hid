@@ -32,6 +32,7 @@ Ui RepoTreeViewCtxMenu {
     Action FetchAll {
         Text            "All Remotes";
         StatusToolTip   "Fetch repository changes from all remotes.";
+        ConnectTo       onCtxFetchAll();
     };
 
 
