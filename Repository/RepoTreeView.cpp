@@ -195,8 +195,7 @@ void RepoTreeView::onCtxFetchAll()
 
         foreach (const QString& alias, aliases) {
             Git::FetchOperation* op = new Git::FetchOperation( repo->gitRepo() );
-            // TODO: needs extension in GW-API
-            //op->setRemoteAlias( alias );
+            op->setRemoteAlias( alias );
             op->setBackgroundMode( true );
             connect( op, SIGNAL(finished()), this, SLOT(fetchOperationFinished()) );
             // TODO: create a central dialog to show progress of parallel operations
