@@ -55,6 +55,8 @@ Ui RepoTreeViewCtxMenu {
     Menu CtxMenuSMRepo {
 
         Action      Activate;
+        Separator;
+        Menu        MenuFetch;
 
     };
 
