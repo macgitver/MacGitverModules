@@ -147,7 +147,7 @@ void RepoTreeView::onRepoDeactivated(RM::Repo* repo)
 }
 
 /**
- * @brief Called as soon as one fetch operation finishes.
+ * @brief This slot is called, when a single fetch operation finishes.
  */
 void RepoTreeView::fetchOperationFinished()
 {
