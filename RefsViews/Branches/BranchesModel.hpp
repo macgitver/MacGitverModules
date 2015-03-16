@@ -1,6 +1,6 @@
 /*
  * MacGitver
- * Copyright (C) 2012-2013 The MacGitver-Developers <dev@macgitver.org>
+ * Copyright (C) 2015 The MacGitver-Developers <dev@macgitver.org>
  *
  * (C) Sascha Cunz <sascha@macgitver.org>
  *
@@ -21,11 +21,20 @@
 
 #include <QAbstractItemModel>
 
+#include "libGitWrap/Reference.hpp"
 #include "libGitWrap/Repository.hpp"
 
 #include "Branches/BranchesViewData.hpp"
+#include "RefItem.hpp"
+
+namespace RM
+{
+    class Ref;
+    class Repo;
+}
 
 class RefItem;
+class RefScope;
 
 class BranchesModel : public QAbstractItemModel
 {
@@ -38,7 +47,6 @@ public:
     int rowCount( const QModelIndex& parent ) const;
     int columnCount( const QModelIndex& parent ) const;
     QVariant data( const QModelIndex& index, int role ) const;
-    bool setData( const QModelIndex& index, const QVariant& value, int role );
     Qt::ItemFlags flags( const QModelIndex& index ) const;
     QModelIndex index( int row, int column = 0, const QModelIndex& parent = QModelIndex() ) const;
     QModelIndex parent( const QModelIndex& child ) const;
@@ -50,9 +58,65 @@ public:
 signals:
     void gitError( const Git::Result& error );
 
+private slots:
+    void onRefCreated(RM::Repo* repo, RM::Ref* ref);
+    void onRefDestroyed(RM::Repo* repo, RM::Ref* ref);
+    void onRefMoved(RM::Repo* repo, RM::Ref* ref);
+
+private:
+    QModelIndex index(RefItem* item) const;
+
+    void insertRef(bool notify, const Git::Reference& ref);
+    inline RefItem* insertNamespace(const bool notify, RefItem* parent, const QString& name)
+    {
+        RefItem* next = NULL;
+        if ( notify ) {
+            int fr = parent->children.count();
+            beginInsertRows( index( parent ), fr, fr );
+        }
+
+        next = new RefNameSpace( parent, name );
+
+        if ( notify ) {
+            endInsertRows();
+        }
+        return next;
+    }
+
+    inline void insertBranch(const bool notify, RefItem *parent, const Git::Reference& ref)
+    {
+        if ( notify ) {
+            int row = parent->children.count();
+            beginInsertRows( index( parent ), row, row );
+        }
+
+        new RefBranch( parent, ref );
+
+        if (notify) {
+            endInsertRows();
+        }
+    }
+
+    inline RefScope* scopeForRef( const Git::Reference& ref ) const
+    {
+        RefItem* scope = NULL;
+        if ( ref.isLocal() )        scope = mHeaderLocal;
+        else if ( ref.isRemote() )  scope = mHeaderRemote;
+        else scope = mHeaderTags;
+
+        return static_cast< RefScope* >( scope );
+    }
+
 private:
     BranchesViewData*   mData;
     RefItem*            mRoot;
+
+    RefScope*           mHeaderLocal;
+    RefScope*           mHeaderRemote;
+    RefScope*           mHeaderTags;
+
+private:
+    static void findInvalidRefItems(QVector<RefItem*>& invalidItems, RefItem* item, const RM::Ref* ref);
 };
 
 #endif

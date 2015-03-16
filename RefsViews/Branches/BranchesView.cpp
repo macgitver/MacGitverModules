@@ -37,9 +37,9 @@
 
 BranchesView::BranchesView()
     : ContextView( "Branches" )
+    , mTree( new QTreeView )
     , mData( NULL )
 {
-    mTree = new QTreeView;
 #ifdef Q_OS_MACX
     mTree->setAttribute( Qt::WA_MacShowFocusRect, false );
 #endif
@@ -47,6 +47,7 @@ BranchesView::BranchesView()
     mTree->setIndentation( 12 );
     mTree->setHeaderHidden( true );
     mTree->setRootIsDecorated( false );
+    mTree->setItemDelegate( &mRefDelegate );
 
     setupActions( this );
 
@@ -114,9 +115,6 @@ void BranchesView::onCheckoutRef()
                               .arg(branch->reference().shorthand())
                               .arg(r.errorText()) );
     }
-
-    // TODO: workaround to update the views
-    update();
 }
 
 void BranchesView::onRemoveRef()
@@ -147,9 +145,6 @@ void BranchesView::onRemoveRef()
                               .arg(branch->reference().shorthand())
                               .arg(r.errorText()) );
     }
-
-    // TODO: workaround to update the views
-    mData->mModel->rereadBranches();
 }
 
 bool BranchesView::checkRemoveRef( const Git::Reference& ref )
@@ -260,10 +255,11 @@ void BranchesView::attachedToContext(BlueSky::ViewContext* ctx, BlueSky::ViewCon
     delete mData;
     mData = myData;
 
-    connect( mData->mModel, SIGNAL(gitError(const Git::Result&))
-             , this, SLOT(actionFailed(const Git::Result&)) );
+    connect( mData->mModel, SIGNAL(gitError(const Git::Result&)),
+             this, SLOT(actionFailed(const Git::Result&)) );
 
     mTree->setModel( mData->mSortProxy );
+    mTree->expandAll();
 }
 
 void BranchesView::detachedFromContext(BlueSky::ViewContext* ctx )

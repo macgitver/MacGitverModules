@@ -22,6 +22,8 @@
 #include "libGitWrap/Repository.hpp"
 #include "libGitWrap/Result.hpp"
 
+#include "libMacGitverCore/RepoMan/Ref.hpp"
+
 #include <QFont>
 #include <QLinearGradient>
 #include <QFileIconProvider>
@@ -30,7 +32,6 @@ RefItem::RefItem()
     : parent( NULL )
 {
 }
-
 
 RefItem::RefItem(RefItem *p)
     : parent( p )
@@ -48,6 +49,16 @@ RefItem::~RefItem()
     qDeleteAll( children );
 }
 
+/**
+ * @brief   Checks the validity of internal data.
+ *
+ * @return  the default implementation returns always true
+ */
+bool RefItem::isValid() const
+{
+    return true;
+}
+
 QVariant RefItem::data(int col, int role) const
 {
     Q_UNUSED( col )
@@ -55,22 +66,10 @@ QVariant RefItem::data(int col, int role) const
     return QVariant();
 }
 
-bool RefItem::setData(Git::Result& result, const QVariant &value, int role, int col)
-{
-    Q_UNUSED( value );
-    Q_UNUSED( role );
-    Q_UNUSED( col );
-    return false;
-}
 
 QString RefItem::text() const
 {
     return QString();
-}
-
-bool RefItem::isEditable() const
-{
-    return false;
 }
 
 
@@ -87,11 +86,8 @@ QVariant RefScope::data(int col, int role) const
     case Qt::DisplayRole:
         return mText;
 
-    case Qt::BackgroundRole:
-        QLinearGradient g( 0, 0, 100, 0 );
-        g.setColorAt( 0.0, QColor(0, 0, 0, 0) );
-        g.setColorAt( 1.0, QColor(216, 233, 255) );
-        return QBrush( g );
+    case RefItem::RowBgRole:
+        return QColor(216, 233, 255);
     }
 
     if ( role == RefItem::TypeRole )
@@ -129,10 +125,34 @@ QVariant RefNameSpace::data(int col, int role) const
 }
 
 
-RefBranch::RefBranch(RefItem *p, const QString &t, const Git::Reference &ref)
+RefBranch::RefBranch(RefItem *p, const Git::Reference &ref)
     : RefItem( p )
     , mRef( ref )
 {
+}
+
+/**
+ * @brief   Am I pointing to a valid Git::Reference object?
+ *
+ * @return  true, if the owned reference is valid; false otherwise
+ */
+bool RefBranch::isValid() const
+{
+    return (mRef.isValid() && !mRef.wasDestroyed());
+}
+
+/**
+ * @brief   Workaround to compare the reference name.
+ *
+ *          This method will be deleted when migrating to RM::RepoMan.
+ *
+ * @param   ref the RM::Ref to compare with
+ *
+ * @return  true when both names match; false otherwise
+ */
+bool RefBranch::sameReference(const RM::Ref* ref) const
+{
+    return ref && mRef.name() == ref->fullName();
 }
 
 QVariant RefBranch::data(int col, int role) const
@@ -150,24 +170,16 @@ QVariant RefBranch::data(int col, int role) const
         }
     }
 
-    else if ( role == Qt::BackgroundRole )
+    else if ( role == RefItem::RowBgGradientRole )
     {
         Git::Result r;
-        if ( mRef.isCurrentBranch() )
+
+        if ( mRef.compare( mRef.repository().HEAD(r) ) == 0 )
         {
-            QLinearGradient g( 0, 0, 0, 30 );
-            g.setColorAt( 0.0, QColor(255, 255, 255, 0) );
-            g.setColorAt( 0.5, QColor(255, 181, 79) );
-            g.setColorAt( 1.0, QColor(255, 255, 255, 0) );
-            return QBrush(g);
-        }
-        else if ( mRef.compare( mRef.repository().HEAD(r) ) == 0 )
-        {
-            QLinearGradient g( 0, 0, 0, 30 );
-            g.setColorAt( 0.0, QColor(255, 255, 255, 0) );
-            g.setColorAt( 0.5, QColor(255, 181, 79).lighter() );
-            g.setColorAt( 1.0, QColor(255, 255, 255, 0) );
-            return QBrush(g);
+            QColor back = mRef.isCurrentBranch()
+                          ? QColor::fromHsl(35, 255, 190)
+                          : QColor::fromHsl(35, 255, 190).lighter(130);
+            return back;
         }
     }
 
@@ -180,17 +192,5 @@ QVariant RefBranch::data(int col, int role) const
     return QVariant();
 }
 
-bool RefBranch::setData(Git::Result& result, const QVariant &value, int role, int col)
-{
-    if ( col == 0 )
-    {
-        QString newName = value.toString();
-        if ( newName.isEmpty() || (newName == mRef.name()) )
-            return false;
 
-        mRef.rename( result, newName );
-        return result;
-    }
 
-    return false;
-}

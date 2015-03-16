@@ -19,18 +19,21 @@
 #ifndef MGV_BRANCHES_VIEW_HPP
 #define MGV_BRANCHES_VIEW_HPP
 
+#include "hic_BranchesViewActions.h"
+
 #include "libBlueSky/Contexts.hpp"
+
+#include "RefsViewDelegate.h"
 
 class QTreeView;
 class QModelIndex;
-
-#include "hic_BranchesViewActions.h"
 
 namespace Git
 {
     class Reference;
     class Result;
 }
+
 
 class BranchesViewData;
 
@@ -65,6 +68,7 @@ private:
     inline bool checkRemoveRef(const Git::Reference &ref);
 
 private:
+    RefsViewDelegate    mRefDelegate;
     QTreeView*          mTree;
     BranchesViewData*   mData;
 };
