@@ -16,8 +16,6 @@
 
 Ui RepoTreeViewCtxMenu {
 
-
-
     Action Activate {
         Text            "&Activate";
         StatusToolTip   "Make this repository the active one.";
@@ -30,9 +28,25 @@ Ui RepoTreeViewCtxMenu {
         ConnectTo       onCtxClose();
     };
 
+
+    Action FetchAll {
+        Text            "All Remotes";
+        StatusToolTip   "Fetch repository changes from all remotes.";
+        ConnectTo       onCtxFetchAll();
+    };
+
+
+    Menu MenuFetch {
+        Text            "Fetch";
+        Action          FetchAll;
+        Separator;
+    };
+
     Menu CtxMenuRepo {
 
         Action      Activate;
+        Separator;
+        Menu        MenuFetch;
         Separator;
         Action      Close;
 
@@ -41,6 +55,8 @@ Ui RepoTreeViewCtxMenu {
     Menu CtxMenuSMRepo {
 
         Action      Activate;
+        Separator;
+        Menu        MenuFetch;
 
     };
 

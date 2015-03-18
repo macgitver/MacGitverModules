@@ -46,12 +46,17 @@ private slots:  // from actions
     void onCtxActivate();
     void onCtxClose();
 
+    void onCtxFetchAll();
+
 private slots:  // from mRepos
     void contextMenu( const QModelIndex& index, const QPoint& globalPos );
 
 private slots:  // for MacGitver::repoMan()
     void onRepoActivated(RM::Repo* repo);
     void onRepoDeactivated(RM::Repo* repo);
+
+private slots:
+    void fetchOperationFinished();
 
 private:
     QModelIndex deeplyMapToSource( QModelIndex current ) const;
