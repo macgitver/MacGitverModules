@@ -18,23 +18,28 @@ Ui RemotesModuleActions {
 
     Container RemotesAC {
 
-        Menu Remotes {
+        Menu MnuRemotes {
+            Text    "Remotes";
 
-            Text    "R&emotes";
-
-            Action RemotesCreate {
-                Text        "&Create...";
-                _ConnectTo  onRemoteCreate();
+            Action RemoteAdd {
+                Text        "Add Remote ...";
+                _ConnectTo  onRemoteCreateEdit();
             };
 
-            Action RemotesFetch {
-                Text        "&Fetch";
-            };
 
-            Action RemotesPush {
-                Text        "P&ush...";
-            };
+        };
+    };
 
+    Container RemotesFetchAC {
+
+        Menu MnuFetch {
+            Text    "Fetch";
+
+            Action RemotesFetchAll {
+                Text        "All Remotes";
+                _ConnectTo  onRemotesFetchAll();
+            };
+            Separator;
         };
 
     };

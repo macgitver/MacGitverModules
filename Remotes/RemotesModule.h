@@ -38,7 +38,16 @@ private:
     static BlueSky::View* createRemotesView();
 
 private slots:
-    void onRemoteCreate();
+    // RemotesAC
+    void onRemoteCreateEdit();
+    void onRemoteDelete();
+
+private slots:
+    // RemotesFetchAC
+    void onRemotesFetchAll();
+
+private slots:
+    void onOperationFinished();
 };
 
 #endif
